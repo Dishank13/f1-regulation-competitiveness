@@ -1,0 +1,49 @@
+# --- FastF1 cache (grows to hundreds of MB; never commit) ---
+cache/
+.fastf1_cache/
+fastf1_cache/
+data/cache/
+**/fastf1_http_cache.sqlite
+
+# --- Raw API data (rebuildable from source; never commit) ---
+data/raw/**
+!data/raw/.gitkeep
+
+# --- Processed tables: ignore the Parquet, KEEP the data dictionaries ---
+data/processed/**
+!data/processed/.gitkeep
+!data/processed/**/
+!data/processed/**/*.md
+!data/processed/**/*.yaml
+!data/processed/**/*.yml
+!data/processed/**/*.json
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+*.egg-info/
+.eggs/
+build/
+dist/
+
+# --- Notebooks ---
+.ipynb_checkpoints/
+
+# --- Secrets / environment ---
+.env
+.env.*
+!.env.example
+
+# --- Tooling / editors / OS ---
+.claude-flow/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
