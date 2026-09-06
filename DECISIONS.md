@@ -356,3 +356,218 @@ regardless of outcome (8.6); the falsification criteria (9); the raw-median
 baseline comparator (4.3); the pace model ship gates (4.4); confounds 1 and 2
 stay in the memo body rather than LIMITATIONS.md; and the section 11 reporting
 rule keeps its wording.
+
+---
+
+## 2026-09-06 — Entry 013 — G — Seasons in scope per tier
+
+**Question.** Which seasons does each tier cover? (Supersedes Entry 010, which
+deferred this pending the coverage report. The original entry is left intact.)
+
+**Status.** CLOSED.
+
+**Option chosen.** Tier A 2006–2026 (21 seasons). Tier B 2018–2026 (9 seasons).
+
+**Alternatives rejected.** None on Tier B — the boundary is a fact about the data
+source, not a preference. FastF1 returns no lap data whatsoever for 2014–2017 on
+every probe; 2018–2026 return `LapTime` at 92.6–99.9%, `Compound` at 100%,
+`TyreLife` at 97.3–100% and `TrackStatus` at 100% in every probed session.
+
+**Reason.** Verified empirically per the plan's requirement rather than adopting
+the commonly cited 2018 figure on trust. The figure happened to be right; the
+verification was still necessary, and it also produced the field-completeness
+numbers the pace model depends on.
+
+**Consequence recorded.** Tier B is **corroboration only** and cannot carry an
+independent conclusion: its placebo pool is 2 boundaries, and the 2021–22
+boundary's Tier B pre-period is 2018–2020 of which 2019 and 2020 are both flagged
+discontinuities, leaving one unflagged pre-season. Stated in the plan, in the
+memo wherever a Tier B result appears, and in the README so a reader need not
+find it.
+
+---
+
+## 2026-09-06 — Entry 014 — B″ — Tier A segment eligibility by era
+
+**Question.** Phase 1 found that qualifying in 2006–2009 was run on race fuel:
+`median(Q3−Q2)` is positive in all four of those seasons (+0.45 to +1.70 s) and
+negative in all seventeen from 2010 (−0.15 to −0.37 s), with no overlap and the
+sign flipping exactly on the refuelling ban. The Entry 003 evolution adjustment
+reads that offset as track evolution, so in 2006–09 it credits heavy-fuel laps by
+up to 1.7 s — a systematic bias correlated with fuel strategy, affecting roughly
+a quarter of team observations in those seasons. How should Tier A scope respond?
+
+**Status.** DECIDED.
+
+**Option chosen.** **Option 3** — Q3 excluded in 2006–2009; all three segments
+from 2010; evolution adjustment as in Entry 003, needing only `E(Q1→Q2)` for the
+earlier era.
+
+**Alternatives rejected.**
+- *Option 1, raise the Tier A floor to 2010.* Rejected as primary: it deletes the
+  2009 boundary, which §8.5 identifies as the least contaminated in the study,
+  and starts the series on the refuelling-ban discontinuity — so it buys less
+  cleanliness than it appears to. **Retained as R8 variant O1.**
+- *Option 2, Q1+Q2 only in every season.* Rejected: Finding E (the Q2
+  starting-tyre rule) lands directly on it, and option 2 rests its entire weight
+  on Q2. **Retained as R8 variant O2.**
+- *Option 4, Q1 only.* Rejected: the −0.43 s Q1→Q2 delta *is* the sandbagging,
+  and it is worst at the front, where M4 and M5 measure. **Retained as R8
+  variant O4.**
+
+**Reason.** The estimand is low-fuel maximum-attack pace. In 2006–09 Q3 does not
+measure that estimand at all — it measures something else. Excluding a
+non-observation preserves the rule ("use every segment that measures the
+estimand") while its realisation changes because the sport changed what Q3 was.
+That is categorically different from tuning the estimator to suit an era.
+
+**Condition 1 — R8 promoted to a four-way sweep.** All four options run as
+robustness, not merely the segment-rule variants originally scoped.
+
+**Condition 2 — pre-committed decision rule, fixed before results exist.** O1
+excludes the 2009 boundary; O3 retains it on Q1/Q2 evidence. These are the two
+defensible treatments and they rest on different data. **If the sign or the
+significance of the 2009 boundary estimate differs between O1 and O3, the memo
+reports 2009 as INDETERMINATE.** We do not select whichever option produces the
+cleaner story. Committed here, in advance, because it will be tempting to break
+later.
+
+**Condition 3 — an unnamed cost, now named and measured.** Option 3 measures
+front-running teams on a Q1/Q2 lap in 2006–09 and on a full-attack Q3 lap from
+2010. Because front-runners demonstrably do not fully attack in Q1/Q2, that is an
+era-dependent bias concentrated at exactly the ranks M4 and M5 measure. The
+engineering role had offered Q1→Q2 median stability across eras as reassurance;
+the analyst rejected that as insufficient — **identical medians do not establish
+identical composition**, and if the 2006–09 offset mixes track evolution and
+sandbagging differently, the adjustment is biased in a way the medians conceal.
+Diagnostic D1 (plan §4.1.2) now tests composition directly: D1a estimates the
+Q1→Q2 offset separately by competitive stratum and asks whether the
+front-minus-back difference shifts across the 2010 line; D1b reports
+segment-source composition by field position; D1c tests M4 and M5 for a step at
+2010 with M1 and M2 as controls. Added as confound 15. **If the front-of-field
+metrics behave differently across the 2010 line, that is a reported finding.**
+
+---
+
+## 2026-09-06 — Entry 015 — 2009 boundary framing
+
+**Question.** Is the 2009 boundary correctly described as "clean"?
+
+**Status.** DECIDED — corrected.
+
+**Option chosen.** **"Least contaminated," never "clean."** The word "clean" is
+not used of this or any boundary in the plan or the memo.
+
+**Reason.** Analyst correction of the engineering role's framing. "No intruding
+reset" is a narrow claim and "clean" overstated it. The 2009 boundary carries at
+least four co-occurring shocks that no model here separates, now listed as
+confound 14: three simultaneous technical changes (aero reset, slick tyres,
+KERS); Honda's withdrawal producing Brawn as a new entity inside the window,
+which the continuity mapping treats as continuous when it arguably is not; the
+2008 financial crisis reshaping grid budgets during the pre-period, an
+uncontrolled shock to precisely the resource asymmetry the metric is sensitive
+to; and race-fuel qualifying across the entire pre-period and boundary season.
+
+---
+
+## 2026-09-06 — Entry 016 — C3 revision — intent contrast demoted
+
+**Question.** Should the Intent-R contrast occupy a confirmatory test slot?
+(Revises Entry 006, which is left intact.)
+
+**Status.** DECIDED.
+
+**Option chosen.** **No.** Both intent contrasts are descriptive only. The
+confirmatory family drops from 3 tests to 2 (pooled `b2`, pooled `b3`), and the
+freed slot is **returned to the budget, not reallocated**, so the Holm correction
+across the family is correspondingly less severe.
+
+**Alternatives rejected.**
+- *Keep Intent-R confirmatory* — a 3-versus-2 contrast does not justify spending
+  family-wise error budget on a question the data cannot answer.
+- *Reallocate the freed slot to another test* — rejected; the budget shrinks.
+
+**Reason.** Analyst decision. The finding itself stands and is retained in full,
+including the two-column split and the source citations. What changes is its
+status: **the observation that Intent-C is untestable — because the regulator
+almost never publicly promised the thing this analysis measures — is a finding
+about the question, not a failed test.** It moves to the memo's opening framing
+beside the raceability-versus-convergence gap. An analysis measuring pace
+convergence is measuring something the regulator, on its own public record,
+mostly did not claim to be delivering, and that reframes what a null result would
+even mean.
+
+---
+
+## 2026-09-06 — Entry 017 — Regulator statement as intent evidence
+
+**Question.** During Phase 1 research the engineering role found a contemporaneous
+statement by a principal author of the 2022 regulations about how the field would
+behave, and excluded it from the plan under the Entry 009 constraint (b)
+prohibition on directional priors, flagging rather than silently dropping it.
+Should it be included?
+
+**Status.** DECIDED.
+
+**Option chosen.** **Include**, in the intent evidence section (plan §2.4), with
+citation, under a binding handling rule.
+
+**Reason.** Analyst ruling: constraint (b) is about not seeding *our own*
+expectation of the result, not about suppressing documentation of what the
+regulator publicly claimed — which is the raw material of the intent
+classification. Excluding it would have left the intent evidence incomplete.
+
+**Handling rule, binding.** The statement substantiates that the 2021–22 package
+was publicly framed as a long-run convergence measure. It must not appear in the
+results narrative, the memo abstract, the figure captions, or any text adjacent
+to an estimate, and must never be described as a prediction our results confirm
+or contradict. The §1 prohibition on directional priors covers third-party
+predictions quoted approvingly, not only our own.
+
+**Source.** Motorsport Week, 13 May 2021,
+<https://www.motorsportweek.com/2021/05/13/brawn-expects-field-to-spread-under-new-2022-regulations/>
+
+---
+
+## 2026-09-06 — Entry 018 — §6.3 deleted-lap filter removed
+
+**Question.** Does Jolpica expose a deleted / invalidated qualifying lap field?
+(Plan §6.3 required this be probed, not assumed.)
+
+**Status.** DECIDED — filter removed.
+
+**Option chosen.** **Removed as unimplementable.** Every qualifying result across
+all 21 seasons carries exactly `number, position, Driver, Constructor, Q1, Q2,
+Q3`. No unknown fields appear in any season. Per the original instruction the
+filter is removed rather than left as a rule that silently never fires.
+
+**Reason.** Empirical, and the plan pre-committed to this outcome.
+
+**Bias recorded as confound 13.** A lap deleted for track limits that nonetheless
+appears in the published times slightly flatters that team. Critically this is
+**time-varying** — automated track-limits enforcement became markedly more
+aggressive later in the study window — so it sits inside a time-series analysis
+of exactly the quantity it biases. It cannot be bounded from this source and is
+not dismissed as noise.
+
+---
+
+## 2026-09-06 — Entry 019 — Confirmed without change
+
+Recorded so the ledger shows what was reviewed and left alone, not only what
+moved. All confirmed by the analyst at Amendment 1:
+
+- H2 downgraded to descriptive estimate; "faster than in a stable period" banned;
+  confirmatory slot retained so the budget is not quietly reduced. The
+  three-season maximum stable-regulation period is a finding about F1's
+  regulatory cadence and belongs in the memo body.
+- Placebo pools: Tier A 9, Tier B 2. Tier B's placebo is powerless and a null
+  there is never presented as reassurance.
+- R14 and R15 added; battery of 15; reporting rule becomes "fewer than 10 of 15."
+  Two-thirds ratio preserved exactly, wording intact.
+- Placebo test runs regardless of outcome; falsification criteria as written;
+  raw-median baseline comparator; pace model ship gates; confounds 1 and 2 stay
+  in the memo body rather than LIMITATIONS.md.
+- Finding E (the Q2 starting-tyre rule) remains **unverified**. The Phase 2
+  compound test proceeds; if confirmed it is added to the confound list and the
+  robustness battery by amendment commit, not asserted in the meantime.

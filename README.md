@@ -57,9 +57,16 @@ and minimal traffic, which makes it a clean read on car performance — this tie
 is a serious candidate for the primary metric, not a fallback.
 
 **Tier B — recent history, rich metric.** Fuel- and tyre-corrected race pace from
-FastF1. A per-race regression strips out fuel load, tyre compound, and tyre age
-to recover underlying car pace, which is then normalised the same way as Tier A.
-Higher resolution, narrower coverage; brackets the most recent resets.
+FastF1, 2018–2026 (floor verified empirically: 2014–2017 return no lap data at
+all). A per-race regression strips out fuel load, tyre compound, and tyre age to
+recover underlying car pace, which is then normalised the same way as Tier A.
+Higher resolution, narrower coverage; brackets the two most recent resets.
+
+> **Tier B is corroboration only. It cannot carry an independent conclusion.**
+> Its placebo pool is two boundaries, and the 2021–22 boundary has just one
+> unflagged pre-season (2018; 2019 and 2020 are both flagged discontinuities).
+> Tier B can support or undercut a Tier A result. It cannot establish one on its
+> own, and no claim in this repository rests on Tier B alone.
 
 Where the tiers agree, confidence rises. Where they disagree, the disagreement is
 reported as a finding rather than reconciled away.
