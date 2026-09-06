@@ -1021,3 +1021,96 @@ Work stops and returns to the analyst for only three things: Decision A
 thresholds, Decision B primary metric freeze, and anything that **invalidates a
 committed plan decision**. A finding that changes interpretation is recorded and
 does not stop the run; only one that blocks the next step does.
+## 2026-09-07 — Entry 034 — D1c result: M4 restriction TRIGGERED
+
+**Question.** Does M4 or M5 show a 2010 level shift at least half the median
+absolute reset-boundary shift, triggering the Entry 021 restriction?
+
+**Status.** DECIDED by pre-committed rule. **M4 restricted. M5 not restricted.**
+
+**Result.** M4 front gap shifts +0.827 at 2010 [95% CI 0.643, 1.118] against a
+threshold of 0.306. Triggered. M5 front pair shifts +0.021 [−0.057, 0.132],
+CI containing zero. Not triggered.
+
+**Applied as written.** M4 cannot carry a cross-2010 claim and is restricted to
+within-era comparison. Any M4 boundary estimate spanning 2010 is withdrawn from
+the memo rather than caveated in it.
+
+---
+
+## 2026-09-07 — Entry 035 — D1c controls failed; interpretation changed, rule unchanged
+
+**Question.** Plan §4.1.2 predicted the bias signature would be a step in
+front-of-field metrics that the whole-field controls do not show. Did the
+controls behave as controls?
+
+**Status.** **No.** Recorded as a finding; does not block the run.
+
+**Result.** M1 and M2 — the designated whole-field controls — also step sharply
+at 2010, and more strongly in relative terms than M4:
+
+| metric | 2010 shift ÷ median abs reset shift |
+|---|---:|
+| M2 IQR (control) | 1.93× |
+| M1 sd (control) | 1.46× |
+| M4 front gap | 1.35× |
+| M5 front pair | 0.21× |
+
+M2, a control, has the largest relative 2010 step of any metric.
+
+**Consequence.** The 2010 discontinuity is **not specific to front-of-field
+measurement**, so D1c cannot attribute it to segment-eligibility bias. Three
+causes are collinear at 2010 and none is separable: grid composition (10 → 12
+constructors, three new backmarkers; M6 moves 1.664 → 6.122), the refuelling ban,
+and segment eligibility. The D1c design assumed the first two were not competing
+explanations at that boundary. They are.
+
+**The M4 restriction is NOT weakened by this.** It was pre-committed on observed
+magnitude, not on a diagnosis of cause. Granting an exemption now, because a
+competing explanation has appeared *after* seeing the result, is precisely what
+pre-commitment exists to prevent. The restriction stands.
+
+---
+
+## 2026-09-07 — Entry 036 — A non-reset season out-moves the reset boundaries
+
+**Question.** How large is the 2010 shift relative to the reset boundaries the
+study exists to measure?
+
+**Status.** RECORDED, not interpreted. Interpretation is Decision H.
+
+**Finding.** The 2010 step exceeds the median absolute reset-boundary shift on
+M1 (1.46×), M2 (1.93×) and M4 (1.35×). **2010 is not a reset season.** This is
+the placebo logic arriving early and pointing at the method rather than at
+Formula 1: if ordinary season-to-season churn — chiefly grid composition — moves
+these metrics further than regulation resets do, then reset estimates are being
+read against a baseline noisier than the effect.
+
+**Bearing on Decision B, flagged now.** A metric highly sensitive to grid
+composition is a poor primary in a study window containing three grid expansions
+(2010, 2016, 2026) — one of which is the partial current season carrying the
+headline reset. This is put to the analyst with the Decision B package rather
+than resolved here.
+
+---
+
+## 2026-09-07 — Entry 037 — M5 is below the driver-noise floor in recent seasons
+
+**Question.** Is M5 interpretable as a car-performance measure?
+
+**Status.** RECORDED. Constrains Decision B.
+
+**Finding.** Plan §4.3 requires M7 be reported alongside any best-of-team result,
+because a between-team difference smaller than the within-team driver spread is
+not interpretable as a car effect. M7 sits at 0.27–0.46 across the whole window.
+**M5 is below M7 in most seasons** — 2025: M5 = 0.237 vs M7 = 0.297; 2026:
+M5 = 0.141 vs M7 = 0.280.
+
+In those seasons the gap between the two fastest cars is smaller than the typical
+gap between two drivers in the same car. M5 is therefore not interpretable as a
+car-performance measure in the recent era, **whatever its statistical
+significance**. This is a measurement-floor problem, not a power problem; more
+events would not fix it.
+
+**Consequence.** M5 should not be selected as primary for any analysis spanning
+the recent era. Recorded for the Decision B package.

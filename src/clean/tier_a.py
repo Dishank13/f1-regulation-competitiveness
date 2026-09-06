@@ -201,11 +201,29 @@ def build() -> tuple[pd.DataFrame, pd.DataFrame, dict]:
             "one qualifying session per round in every season; sprint weekends "
             "do not duplicate rows", kind="transform")
 
+    # ---- driver-level table (M7 needs within-team driver deltas) -------------
+    didx = df.groupby(["season", "round", "driver"])["time_adj"].idxmin()
+    drivers = df.loc[didx].copy().rename(
+        columns={"time_adj": "q_adj", "segment": "source_segment"})
+    drivers["q_best_event"] = drivers.groupby(
+        ["season", "round"])["q_adj"].transform("min")
+    drivers["delta"] = 100 * (drivers["q_adj"] / drivers["q_best_event"] - 1)
+    # Normalised to the same per-event reference as the team table, so team and
+    # driver deltas are on one scale and M7 is comparable to M1-M6.
+    drivers = drivers.merge(
+        teams[["season", "round"]].drop_duplicates(),
+        on=["season", "round"], how="inner")
+    log("D0 driver-event observations formed", "cells -> driver-events",
+        len(df), len(drivers),
+        "AGGREGATION: best adjusted lap per driver; feeds M7 only",
+        kind="aggregate")
+
     # ---- event-track close-out ----------------------------------------------
     final_events = teams.groupby(["season", "round"]).ngroups
     log("E2 events surviving to the final table", "events",
         len(ev), final_events, "reconciliation check", kind="baseline")
 
+    notes["drivers"] = drivers
     return teams, pd.DataFrame(ledger), notes
 
 
@@ -361,6 +379,8 @@ def main() -> None:
     teams, led, notes = build()
     teams.to_parquet(config.DATA_PROCESSED / "tier_a_team_event.parquet", index=False)
     led.to_parquet(config.DATA_PROCESSED / "tier_a_row_loss_ledger.parquet", index=False)
+    notes["drivers"].to_parquet(
+        config.DATA_PROCESSED / "tier_a_driver_event.parquet", index=False)
     write_markdown_ledger(teams, led, notes)
     print(led.to_string(index=False))
     print(f"\nfinal: {len(teams):,} team-events, "
