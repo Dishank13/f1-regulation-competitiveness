@@ -215,10 +215,18 @@ def write_markdown_ledger(teams: pd.DataFrame, led: pd.DataFrame, notes: dict) -
         era=["2006-09" if s <= 2009 else "2010+" for s in teams.season])
     src = (teams.groupby("era")["source_segment"].value_counts(normalize=True)
            .mul(100).round(1).unstack(fill_value=0))
-    fmt = (teams.groupby("format_version")
-           .agg(team_events=("delta", "size"),
-                events=("round", lambda s: s.nunique()))
-           if "format_version" in teams.columns else None)
+    # NB: events must be counted as distinct (season, round) PAIRS. Counting
+    # distinct round numbers undercounts badly — round 1 recurs in all 21
+    # seasons — and made the events column sum to 46 against 411.
+    fmt = None
+    if "format_version" in teams.columns:
+        fmt = (teams.assign(_ev=list(zip(teams.season, teams["round"])))
+               .groupby("format_version")
+               .agg(team_events=("delta", "size"), events=("_ev", "nunique")))
+        assert fmt.events.sum() == teams.groupby(["season", "round"]).ngroups, (
+            "format-version event counts do not reconcile with the final table")
+        assert fmt.team_events.sum() == len(teams), (
+            "format-version team-event counts do not reconcile")
 
     drop = notes.get("events_no_parseable_times", [])
     fb = notes.get("adjustment_fallbacks", [])

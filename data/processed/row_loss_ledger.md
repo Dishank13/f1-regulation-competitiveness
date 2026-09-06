@@ -72,9 +72,9 @@ Format version is derived empirically from two cross-checked sources — the Jol
 
 | format_version    |   team_events |   events |
 |:------------------|--------------:|---------:|
-| conventional      |          4042 |       23 |
+| conventional      |          4042 |      383 |
 | sprint            |            60 |        6 |
-| sprint_qualifying |           165 |       11 |
+| sprint_qualifying |           165 |       16 |
 | sprint_shootout   |            60 |        6 |
 
 ## Representative-time source segment, by era
