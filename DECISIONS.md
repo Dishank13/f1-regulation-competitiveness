@@ -571,3 +571,223 @@ moved. All confirmed by the analyst at Amendment 1:
 - Finding E (the Q2 starting-tyre rule) remains **unverified**. The Phase 2
   compound test proceeds; if confirmed it is added to the confound list and the
   robustness battery by amendment commit, not asserted in the meantime.
+
+---
+
+## 2026-09-06 — Entry 020 — D1a — condition 3 tested, not detected
+
+**Question.** Does the composition of the `E(Q1→Q2)` offset shift across the
+2010 line, biasing the §4.1.1 adjustment in a way median comparison conceals?
+(Entry 014 condition 3.)
+
+**Status.** DECIDED — **tested, not detected at achievable resolution.**
+Explicitly **not** recorded as "concern resolved."
+
+**Result.** Front-minus-back offset −0.3035 s in 2006–09, −0.3330 s in 2010+.
+Shift +0.0295 s, bootstrap 95% CI [−0.0472, +0.0938], containing zero.
+
+**Reason for the wording.** A confidence interval containing zero is not an
+equivalence test. This result rules out composition shifts larger than roughly
+**0.09 s** and says nothing about smaller ones. The early era contributes 70
+events against 337, so the asymmetry in precision is structural and cannot be
+improved with the available data. A composition shift below the detection floor
+remains possible and is not claimed to be absent.
+
+**Analyst note.** Stating the detection floor rather than reading the CI as
+equivalence was called out as the standard to hold. It is now the standard for
+every null in this project, including the Tier B ledger and the Finding E test.
+
+---
+
+## 2026-09-06 — Entry 021 — D1b — unresolved; restriction rule pre-committed
+
+**Question.** Front-third teams draw 0% of representative times from Q3 before
+2010 and 57.7% after, with their Q1 share falling 42.6% → 20.7%. Is this benign?
+
+**Status.** DECIDED — **unresolved, not benign.** Restriction rule fixed in
+advance of D1c.
+
+**Option chosen.** A measurement discontinuity located inside a study designed to
+detect discontinuities, concentrated exactly where M4 and M5 measure, is treated
+as a live threat rather than a caveat. Two commitments, both made before D1c runs
+in Phase 4:
+
+1. **Restriction rule.** If M4 or M5 shows a level shift at the 2010 season
+   boundary at least half the median absolute level shift across the five reset
+   boundaries on the same metric, then **M4 and M5 cannot carry a cross-2010
+   claim**. They are restricted to within-era comparison and any boundary
+   estimate spanning 2010 is **withdrawn from the memo, not caveated in it**.
+2. **2010 joins the placebo battery** as a known measurement-artifact boundary,
+   reported separately from the 9-boundary pool. A "reset effect" at a season
+   with no reset but a large measurement change is diagnostic of **the method**,
+   not of Formula 1, and is reported before any boundary result because it bears
+   on whether the other estimates mean anything.
+
+**Reason.** Written now precisely so it cannot be decided after seeing D1c.
+"Comparable in magnitude" is given a numeric definition in advance for the same
+reason.
+
+---
+
+## 2026-09-06 — Entry 022 — Stratum misspecification in the evolution offset
+
+**Question.** D1a incidentally established that front-runners gain ~0.3 s more
+than backmarkers between Q1 and Q2, in **both** eras, against a field-wide offset
+of ~−0.43 s. Track evolution improves the track for everyone equally; this
+differential does not. What follows?
+
+**Status.** DECIDED — promoted from observation to confound 16, with a
+robustness check and a restriction on claims.
+
+**Option chosen.** Three consequences, all binding:
+
+1. **R16 added** to the battery: the evolution offset re-estimated separately by
+   field position (stratified offset) and everything re-run, testing directly
+   whether the misspecification reaches the metrics. Battery grows to 16 checks;
+   the two-thirds reporting threshold becomes **11 of 16** (10.67 rounded up —
+   a robustness bar is not relaxed by arithmetic convenience).
+2. **Confound 16** in its own right, not a sub-clause of confound 15.
+3. **Restriction on absolute-level claims.** Because the differential is
+   era-stable it biases the *level*, not the *trend*, so boundary estimates
+   difference it out and survive. But the memo may **not** state a standalone
+   field-spread figure without noting that it carries a stratum-dependent offset
+   bias of order 0.3 s in the underlying lap times. Boundary comparisons are
+   unaffected; absolute-level statements are not.
+
+**Reason.** The §4.1 field-wide median offset is a weighted average of two
+distinct quantities — track evolution and a position-dependent sandbagging
+differential — and is therefore misspecified by stratum. The engineering role's
+reasoning that era-stability confines the damage to level rather than trend was
+accepted by the analyst as correct; the finding is nonetheless recorded in the
+plan rather than left in a progress report.
+
+---
+
+## 2026-09-06 — Entry 023 — B1 — Brawn 2009 mapping robustness
+
+**Question.** The Brawn 2009 transition is the most contestable call in the
+continuity mapping (Entry 004) and sits inside the window of the least
+contaminated boundary (confound 14). Does the 2009 result depend on it?
+
+**Status.** DECIDED — targeted robustness run added.
+
+**Option chosen.** **B1**: the 2009 boundary estimated under both
+Brawn-as-continuation and Brawn-as-new-entity. **If the 2009 result depends on
+that choice, the memo says so in the body**, not in a footnote.
+
+**Placement.** B1 is a **boundary-specific** check and is reported separately
+from the 16-check battery, not counted in it. Folding a one-boundary check into
+the bar that gates every headline claim would misrepresent both — it would
+inflate the battery with a check irrelevant to four of the five boundaries, and
+dilute the specific warning B1 exists to raise.
+
+**Reason.** Those two facts together — most contestable mapping call, inside the
+least contaminated boundary — make this the single place where a mapping
+judgement could most plausibly manufacture a result.
+
+---
+
+## 2026-09-06 — Entry 024 — Tier A ledger defects found by analyst review
+
+Four defects in the first Tier A row-loss ledger, all found by the analyst, all
+fixed. Recorded because the ledger is a correctness instrument and its own
+failures belong in the audit trail.
+
+**1. Event count did not reconcile — 412 in coverage §1, 411 in the ledger.**
+Cause: **2025 r6 Miami Grand Prix**. The source returns 20 classified qualifying
+entries but **every** `Q1`/`Q2`/`Q3` field is an empty string, so the event
+produced zero cells and vanished from a cell-level ledger without ever being
+logged as removed. This is an upstream data gap, not a parsing or format issue —
+five other 2025 sprint-weekend rounds carry full times.
+**Fix:** an explicit `E1` filter row now logs it, and the ledger gained a third
+parallel unit track (events, alongside cells and team-events). Event-level
+attrition was invisible in a cell-level ledger, which is exactly how this got
+through. The final team-event count is unchanged at 4,327 — the fix is about
+visibility, which was the point.
+
+**2. Step kinds conflated.** L0 was typed `filter` but is a baseline; L3 was
+typed `filter` but is a transformation. Neither can remove rows. The ledger's own
+preamble says conflating step types is the failure it exists to prevent.
+**Fix:** kinds are now `baseline`, `filter`, `transform`, `aggregate`, `guard`,
+and only `filter`/`guard` carry a removal percentage.
+
+**3. Unnamed L3 fallback event — and it was a bug.** The event was **2015 r16
+United States Grand Prix**. Austin 2015 was rain-disrupted and produced Q1 (20
+times) and Q2 (15 times) but **no Q3 times at all**, so the Q2→Q3 offset was
+unestimable — and also unnecessary, because there were no Q3 times to adjust.
+The flag was over-triggering: it fired whenever an offset could not be estimated,
+including when that offset was not needed.
+**Fix:** the flag now fires only when an offset is required for a segment that
+actually carries times. There are now **zero** fallbacks; no observation in the
+study carries a different measurement basis. The event sits in the placebo pool
+(2015) and inside the 2014 and 2017 boundary windows, so getting this right
+mattered; it stays, with no special status.
+
+**4. T2 not validated to the standard of L2 and T1.** L2 and T1 were validated
+against the distributions they screen (smallest session 18 entries vs threshold
+12; smallest event 9 teams vs threshold 6). T2 was not.
+**Fix:** T2 is now typed `guard` and stated plainly as **tautological** — `delta`
+is built from a per-event minimum, so it is non-negative and finite by
+construction and has no distribution to screen. It is retained as a runtime
+assertion and is explicitly **not** presented as a validated filter.
+
+---
+
+## 2026-09-06 — Entry 025 — Decision D format indicator, implemented and verified
+
+**Question.** Where is the sprint format-version indicator attached, which
+session does Jolpica's qualifying endpoint return on sprint weekends, and does
+any event yield two qualifying sessions? (Decision D, Entry 007.)
+
+**Status.** DECIDED — implemented and empirically verified.
+
+**Findings, all from data:**
+
+- **Exactly one qualifying session per round in every season 2006–2026.** No
+  round yields two. Checked by counting duplicate round numbers in the
+  qualifying endpoint for every season: zero duplicates throughout.
+- **The endpoint returns the Grand Prix qualifying** — the session that sets the
+  race grid. Sprint shootouts are not in it; sprint races live on a separate
+  `/sprint` endpoint. Confirmed by inspection: 2025 sprint rounds return normal
+  Q1/Q2/Q3 with ~45 parseable times each, identical in structure to conventional
+  rounds.
+- **Therefore sprint weekends add, duplicate and remove no rows**, and do **not**
+  interact with the Miami event-reconciliation fix in Entry 024. Miami 2025 was a
+  sprint weekend, but so were five other 2025 rounds that carry full times; the
+  gap is unrelated to format.
+- **Four format versions, derived empirically**, from two cross-checked sources —
+  the Jolpica `/sprint` endpoint (all seasons) and FastF1 `EventFormat` (2018+):
+  `conventional`, `sprint` (2021–22, 3 events each), `sprint_shootout` (2023, 6),
+  `sprint_qualifying` (2024–26, 6/6/5-so-far). **Zero cross-source
+  disagreements.** This matches the plan's provisional expectation of four
+  versions — but the schedule data is what makes it true, not the expectation.
+
+**Attachment point.** `format_version` and `has_sprint_race` are event-level
+columns on the team-event table, added by a `transform` step (F0) asserted to
+change no row counts.
+
+---
+
+## 2026-09-06 — Entry 026 — Wet-session detection unavailable in Tier A pre-2018
+
+**Question.** Plan §6.1 requires wet sessions be flagged and the primary analysis
+run dry-only. Can Tier A do this?
+
+**Status.** **OPEN** — gap identified, analyst decision required. Raised with the
+Tier B ledger.
+
+**Finding.** **No.** Tier A has no weather source: Jolpica exposes no weather
+field in any season, and FastF1 weather begins in 2018. Systematic wet-session
+detection is unavailable for Tier A across **2006–2017** — twelve of twenty-one
+seasons, containing three of the five boundaries.
+
+**Surfaced by** Austin 2015 (Entry 024, defect 3), which should have been caught
+by the wet flag and was not.
+
+**Explicitly rejected.** A spread-based proxy — inferring wetness from anomalous
+within-event spread — is **circular** and will not be implemented. Spread is the
+metric being estimated; inferring the filter from the outcome would launder the
+result into the exclusion rule.
+
+**Not resolved here.** Recorded as confound 17 and brought to the analyst rather
+than papered over with a proxy.

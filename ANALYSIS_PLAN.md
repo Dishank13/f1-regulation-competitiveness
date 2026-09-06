@@ -1,6 +1,30 @@
 # ANALYSIS PLAN — Did F1 regulation resets make the field more competitive?
 
-**Status: PRE-REGISTRATION, AMENDED 2026-09-06 (Amendment 1).**
+**Status: PRE-REGISTRATION, AMENDED 2026-09-06 (Amendments 1 and 2).**
+
+**Amendment 2 — what changed and why.** Driven by diagnostic D1 (§4.1.3–4.1.4)
+and by four defects the analyst found in the first Tier A row-loss ledger.
+No boundary estimate, metric value, or test statistic existed when any of it was
+decided.
+
+1. **D1a recorded as tested-not-detected**, not as concern-resolved: the CI
+   rules out composition shifts above ~0.09 s and is not an equivalence test.
+2. **D1b restriction rule pre-committed** before D1c runs: if M4 or M5 steps at
+   2010 by at least half the median reset-boundary shift, those metrics are
+   restricted to within-era comparison and cross-2010 claims are withdrawn.
+3. **2010 added to the placebo battery** as a known measurement-artifact
+   boundary, reported separately (§8.6).
+4. **Stratum misspecification** promoted from an observation to confound 16 with
+   robustness check R16, plus an explicit restriction on absolute-level claims
+   (§4.1.4). Battery grows to 16; threshold becomes 11 of 16.
+5. **B1 added** (§11.1): the 2009 boundary estimated under both Brawn mappings,
+   reported separately from the headline battery.
+6. **Confound 17**: wet-session detection is unavailable for Tier A before 2018,
+   and a spread-based proxy is rejected as circular. Open gap, analyst decision.
+
+---
+
+**Status of Amendment 1: PRE-REGISTRATION, AMENDED 2026-09-06.**
 The original was committed *before* any analysis code existed and is tagged
 `pre-registration`. That tag is never moved and history before it is never
 rewritten. This amendment is a new commit stating what changed and why.
@@ -342,6 +366,71 @@ with that stated.
 across the 2010 line under this rule, **that is a reported finding**, stated in
 the memo body, whether or not it complicates the headline. D1 is added to
 confound 15 and its results are reported regardless of outcome.
+
+### 4.1.3 D1 results and the rules they trigger (Amendment 2)
+
+**D1a — tested, not detected at achievable resolution.** The front-minus-back
+`E(Q1→Q2)` offset is −0.3035 s in 2006–09 and −0.3330 s in 2010+. The shift
+across the 2010 line is +0.0295 s, bootstrap 95% CI [−0.0472, +0.0938],
+containing zero.
+
+This is recorded as **"condition 3 tested, not detected at achievable
+resolution," not "concern resolved."** The CI is not an equivalence test. It
+rules out composition shifts larger than roughly **0.09 s**; it says nothing
+about smaller ones, and the early era contributes 70 events against 337. A
+composition shift below the detection floor remains possible and is not claimed
+to be absent.
+
+**D1b — unresolved, and not benign.** Front-third teams draw **0%** of their
+representative times from Q3 before 2010 and **57.7%** after, with their Q1
+share falling from 42.6% to 20.7%. The back two-thirds barely move. This is a
+**measurement discontinuity sitting inside a study designed to detect
+discontinuities**, located precisely at the ranks M4 and M5 measure.
+
+**Pre-committed restriction rule, fixed here before D1c runs in Phase 4.** If
+M4 or M5 shows a level shift at the 2010 season boundary comparable in magnitude
+to the shifts attributed to reset boundaries, then:
+
+> **M4 and M5 cannot carry a cross-2010 claim.** They are restricted to
+> within-era comparison, and any boundary estimate from them spanning 2010 is
+> withdrawn from the memo rather than caveated in it.
+
+"Comparable in magnitude" is fixed in advance as: the absolute 2010 level shift
+is at least half the median absolute level shift across the five reset
+boundaries, on the same metric. This rule is written now precisely so it cannot
+be decided after seeing D1c.
+
+**2010 joins the placebo battery as a known measurement-artifact boundary**
+(§8.6). If the method reports a "reset effect" at a season with no reset but a
+large measurement change, that is diagnostic of **the method**, not of F1.
+
+### 4.1.4 Stratum misspecification in the evolution offset (Amendment 2)
+
+D1a established something the plan did not anticipate and that is a finding in
+its own right, independent of the era question:
+
+**The `E(Q1→Q2)` offset is not pure track evolution in either era.**
+Front-runners gain approximately 0.3 s *more* than backmarkers between Q1 and
+Q2, against a field-wide offset of roughly −0.43 s. Track evolution improves the
+track for everyone equally; this differential does not. The §4.1 field-wide
+median offset is therefore a **weighted average of two distinct quantities** —
+track evolution, and a sandbagging differential that varies by field position —
+and is misspecified by stratum.
+
+**What survives and what does not.** The differential is stable across the 2010
+line (D1a), so it biases the *level* of measured field spread, not the *trend*.
+Boundary estimates, which are differences across a boundary, difference it out
+and survive. But:
+
+> **Any absolute-level statement about field spread inherits this bias**, even
+> though boundary comparisons do not. The memo may say "the field converged by
+> X% at boundary Y." It may **not** say "the field spread was X%" as a
+> standalone quantity without stating that the figure carries a stratum-dependent
+> offset bias of order 0.3 s in the underlying lap times.
+
+Mitigation: **R16** re-estimates the offset separately by field position
+(stratified offset) and re-runs everything, testing directly whether the
+misspecification reaches the metrics. Recorded as confound 16.
 
 **Normalisation.** Percentage off the fastest team, so circuits of different lap
 length are comparable:
@@ -723,6 +812,18 @@ Season-to-season boundaries in 2007–2026: 20. Excluding reset boundaries (2009
 | **Tier A** (2006–2026, also excluding 2016) | 2007, 2008, 2011, 2012, 2013, 2015, 2018, 2024, 2025 | **9** |
 | **Tier B** (2018–2026, verified) | 2024, 2025 | **2** |
 
+**2010 is added as a known measurement-artifact boundary** (Amendment 2). It is
+not a reset and not an ordinary control: it is the season at which Tier A's
+front-of-field measurement basis changes (§4.1.2, D1b — front-third Q3 sourcing
+goes 0% → 57.7%) and at which the refuelling ban lands. It is therefore run as a
+**diagnostic placebo, reported separately from the 9-boundary pool**, and it
+carries a distinct interpretation:
+
+> A "reset effect" detected at 2010 — a season with no reset but a large
+> measurement change — is diagnostic of **the method**, not of Formula 1. If the
+> method fires at 2010, the memo reports that before it reports any boundary
+> result, because it bears on whether the other estimates mean anything.
+
 **Caveats that travel with every placebo result:**
 
 - **Tier B's placebo pool is 2 boundaries.** A null placebo result in Tier B is
@@ -831,6 +932,23 @@ identical conditions.
     do **not** establish equal composition of those offsets. Quantified by
     diagnostic D1 (§4.1.2); any differential behaviour of the front-of-field
     metrics across the 2010 line is a reported finding.
+16. **Stratum misspecification in the evolution offset** (Amendment 2). The
+    §4.1 field-wide `E(Q1→Q2)` offset is a weighted average of track evolution
+    and a sandbagging differential that varies by field position: front-runners
+    gain ~0.3 s more than backmarkers, in both eras, against a field-wide offset
+    of ~−0.43 s. Because the differential is era-stable it biases the level, not
+    the trend, so boundary estimates survive — but **every absolute-level
+    statement about field spread inherits it**. Mitigation: R16. See §4.1.4.
+17. **Wet qualifying sessions undetectable in Tier A before 2018**
+    (Amendment 2). Plan §6.1 requires wet sessions be flagged and the primary
+    analysis run dry-only. **Tier A has no weather source**: Jolpica exposes no
+    weather field in any season, and FastF1 weather begins in 2018. Systematic
+    wet-session detection is therefore unavailable for Tier A across 2006–2017,
+    which is twelve of the twenty-one seasons and includes three of the five
+    boundaries. A spread-based proxy is **explicitly rejected as circular** —
+    spread is the metric being estimated, so inferring wetness from it would
+    launder the outcome into the filter. This is an open gap requiring an
+    analyst decision, not a solved problem.
 
 ---
 
@@ -855,11 +973,33 @@ Every one of these is reported, including the ones that undermine the headline.
 | R13 | **Teams grouped by power-unit supplier** | Non-independence of customer teams; PU-led boundaries (confound 8) |
 | R14 | **Team pace = both drivers' mean vs faster driver** | Driver quality imported into a car metric (confound 12) |
 | R15 | **Percentile vs fixed-rank definitions of M3, M4** | Grid-size sensitivity of rank windows |
+| R16 | **Stratified evolution offset (estimated separately by field position) vs field-wide offset** (Amendment 2) | Stratum misspecification, confound 16 (§4.1.4) |
 
-**Reporting rule.** The battery is 15 checks. The threshold is two-thirds,
+**Reporting rule.** The battery is 16 checks. The threshold is two-thirds,
 preserving the ratio originally set at 8 of 12: a headline claim surviving
-**fewer than 10 of 15** is downgraded from "finding" to "suggestive," in the
+**fewer than 11 of 16** is downgraded from "finding" to "suggestive," in the
 memo, in those words.
+
+*Rounding note:* two-thirds of 16 is 10.67. The threshold rounds **up** to 11,
+never down — a robustness bar is not relaxed by arithmetic convenience. At 12
+and 15 the ratio was exact (8/12, 10/15); at 16 it is not, and 11/16 = 0.688 is
+marginally stricter than 0.667.
+
+### 11.1 Boundary-specific robustness checks (Amendment 2)
+
+These bear on a single boundary, not the headline claim, and are therefore
+**reported separately and excluded from the 16-check battery count** — folding a
+one-boundary check into the bar that gates every claim would misrepresent both.
+
+| Check | Varies | Boundary | Reporting rule |
+|---|---|---|---|
+| B1 | Brawn 2009 as continuation vs as new entity | 2009 | **If the 2009 result depends on this choice, the memo says so in the body**, not in a footnote |
+
+B1 exists because the Brawn transition is simultaneously the most contestable
+call in the continuity mapping (DECISIONS.md 004) and located inside the window
+of the least contaminated boundary (confound 14). Those two facts together make
+it the single place where a mapping judgement could most plausibly manufacture a
+result.
 
 ---
 
