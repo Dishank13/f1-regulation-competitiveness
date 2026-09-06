@@ -10,13 +10,15 @@ data/raw/**
 !data/raw/.gitkeep
 
 # --- Processed tables: ignore the Parquet, KEEP the data dictionaries ---
+# The negations admit DOCUMENTATION only. They deliberately do not admit
+# arbitrary *.json, so a pipeline artifact cannot be committed by accident.
 data/processed/**
 !data/processed/.gitkeep
 !data/processed/**/
 !data/processed/**/*.md
-!data/processed/**/*.yaml
-!data/processed/**/*.yml
-!data/processed/**/*.json
+!data/processed/**/dictionary*.yaml
+!data/processed/**/dictionary*.yml
+!data/processed/**/dictionary*.json
 
 # --- Python ---
 __pycache__/
