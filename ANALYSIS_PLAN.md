@@ -1,6 +1,18 @@
 # ANALYSIS PLAN — Did F1 regulation resets make the field more competitive?
 
-**Status: PRE-REGISTRATION, AMENDED 2026-09-06 (Amendments 1 and 2).**
+**Status: PRE-REGISTRATION, AMENDED (Amendments 1, 2 and 3).**
+The original is tagged `pre-registration`. That tag is never moved and history
+before it is never rewritten.
+
+**Amendment 3 (2026-09-07) — what changed and why.** The wet-session rule in
+§6.1 is **withdrawn**: no wet filtering in either era. A uniform external
+precipitation source was built and rejected for three documented reasons, the
+decisive one being that scheduled qualifying dates are systematically wrong on
+postponed sessions and postponement is *caused by* the weather being detected —
+so the error correlates with the quantity measured. Full reasoning in §6.4.
+Consequences: confound 18 (unfiltered wet contamination, non-random across
+seasons), R6 redefined to a hand-verified subset, and the rejected module
+retained unused with its diagnosis. No result existed when this was decided.
 
 **Amendment 2 — what changed and why.** Driven by diagnostic D1 (§4.1.3–4.1.4)
 and by four defects the analyst found in the first Tier A row-loss ledger.
@@ -587,9 +599,12 @@ row-loss ledger goes to the analyst before any threshold is finalised
 
 ### 6.1 Session-level
 
-- Wet or mixed-condition sessions: **flagged, analysed separately, never silently
-  dropped.** Primary analysis is dry-only; a wet-inclusive robustness run is
-  reported (R6).
+- Wet or mixed-condition sessions: **NO WET FILTERING IN EITHER ERA**
+  (Amendment 3, confound 18). The original rule — dry-only primary, wet-inclusive
+  robustness — is withdrawn for Tier A because no source supports a uniform flag.
+  See §6.4. Tier B retains FastF1's session rainfall field as a *recorded
+  attribute*, not an exclusion criterion, so both tiers are treated the same way:
+  wet sessions stay in.
 - Red-flagged or shortened sessions: flagged; included only if the surviving
   representative-lap count clears the per-session minimum.
 - Sprint weekends: included, carrying the format-version indicator of section 3.2.
@@ -623,6 +638,48 @@ Applied in this order, each logged:
   season. Per the original instruction, the filter is **declared unimplementable
   and removed** rather than left as a rule that silently never fires. The
   resulting bias is recorded as confound 13.
+
+---
+
+### 6.4 Why there is no wet filter (Amendment 3)
+
+Plan §6.1 originally required a dry-only primary analysis. **That rule is
+withdrawn.** It cannot be implemented uniformly, and implementing it
+non-uniformly would be worse than not implementing it.
+
+**The framing that decided it.** The problem was never that twelve seasons lack
+a wet filter. It is that applying §6.1 as written yields a filter that is strict
+from 2018 (where FastF1 weather exists) and absent before it — **a time-varying
+exclusion rule inside a study built to detect time-varying changes.** That is the
+same failure class as Finding B and D1b, except self-inflicted. Both eras must be
+treated identically: a uniform filter, or no filter.
+
+**A uniform external source was built and rejected.** Circuit coordinates and
+qualifying dates from Jolpica, precipitation from the Open-Meteo reanalysis
+archive — non-circular, full window, no availability cliff. It failed on three
+counts, documented in
+[`weather_flag_interim.md`](data/processed/weather_flag_interim.md):
+
+1. **Over-flagging.** 33.6% of events at ≥1 mm daily. Wet F1 qualifying is not a
+   third of sessions.
+2. **Clustering.** At ≥5 mm: 2010 flags 42.1% and 2018 33.3%, against 0.0% for
+   2007 and 2025. 2010 and 2018 both sit inside boundary windows.
+3. **The date field is the scheduled date, not the actual one — and it fails
+   hardest where it matters.** Sessions are postponed *because of* severe
+   weather, so the date is systematically wrong on exactly the events a wet
+   filter targets, and the error correlates with the quantity being measured.
+   Suzuka 2019, the highest-precipitation event in the dataset at 134.4 mm, is a
+   confirmed false positive: Saturday was cancelled for Typhoon Hagibis and
+   qualifying ran dry on Sunday.
+
+Point 3 is not a resolution problem a better threshold could fix. **A filter
+that is wrong on the wettest event in the study is worse than no filter**,
+because it removes real sessions while claiming rigour.
+
+The module is retained in the repository, unused, at
+[`src/ingest/weather.py`](src/ingest/weather.py). A rejected approach with a
+written diagnosis is worth more than silence, and it prevents the same idea being
+re-attempted from scratch.
 
 ---
 
@@ -949,6 +1006,20 @@ identical conditions.
     spread is the metric being estimated, so inferring wetness from it would
     launder the outcome into the filter. This is an open gap requiring an
     analyst decision, not a solved problem.
+18. **Wet-session contamination is unfiltered** (Amendment 3). Following §6.4,
+    no wet filter is applied in either era. Wet and mixed-condition qualifying
+    sessions remain in the Tier A table, and a wet session scrambles the running
+    order in a way that has nothing to do with car performance. Three properties
+    make this worse than ordinary noise:
+    (a) it is **not randomly distributed** across seasons or circuits, so it does
+    not average out — some seasons and venues are systematically wetter;
+    (b) at least one confirmed wet session (Austin 2015) sits in the placebo pool
+    and inside two boundary windows;
+    (c) the attempted external flag **failed for documented reasons** (§6.4),
+    so the size of the contamination is not merely unmeasured but currently
+    unmeasurable with the sources available.
+    Mitigation is partial: R6 tests sensitivity to the hand-verified subset we
+    can name. It cannot test sensitivity to the ones we cannot.
 
 ---
 
@@ -963,7 +1034,7 @@ Every one of these is reported, including the ones that undermine the headline.
 | R3 | Constant-circuit subset | Calendar composition |
 | R4 | Constant-constructor subset | Grid composition |
 | R5 | Sprint weekends in / out | Session format |
-| R6 | Wet sessions in / out | Condition filtering |
+| R6 | **Excluding a small hand-verified set of wet qualifying sessions**, each confirmed individually from contemporaneous sources (Amendment 3) | Wet-session contamination, confound 18 |
 | R7 | Representative-lap threshold swept across a range | Arbitrary cutoffs |
 | R8 | **Four-way Tier A scope sweep: O3 (primary) / O1 / O2 / O4** — runs before the metric freeze (§4.1). Carries the pre-committed 2009-indeterminate rule. | Qualifying bias; scope-choice sensitivity |
 | R9 | Tier A vs Tier B on the overlap era | Method dependence |

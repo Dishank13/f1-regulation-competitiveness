@@ -915,127 +915,109 @@ appended to it.
 **Why recorded.** The claim was made in a committed ledger and in a commit
 message. Correcting it in the ledger only, without an entry, would leave the
 audit trail asserting something known to be false.
+## 2026-09-07 — Entry 031 — Confound 17 RESOLVED — no wet filtering in either era
 
----
+**Question.** Should Tier A apply a wet-session exclusion?
 
-## 2026-09-07 — Entry 027 — Format-version event-count bug
+**Status.** DECIDED. **No wet-session filtering in either era.** Fallback applies.
 
-**Question.** The format-version table reported events summing to 46 against 411
-in the final table.
+**Option chosen.** Uniform treatment by *omission*: no wet filter anywhere in
+Tier A, 2006–2026, stated as a limitation.
 
-**Status.** FIXED.
+**Alternatives rejected.**
+- *Open-Meteo whole-day flag as an exclusion rule* — rejected on three
+  documented grounds (Entry 029): over-flagging (33.6% of events at ≥1 mm),
+  heavy season-level clustering (2010 at 42.1% and 2018 at 33.3% versus 0.0% for
+  2007 and 2025 at ≥5 mm, with 2010 and 2018 both inside boundary windows), and a
+  date field that is the *scheduled* date rather than the actual one.
+- *FastF1-only wet flag (2018+)* — rejected as the original problem: a filter
+  strict from 2018 and absent before it is a time-varying exclusion rule inside a
+  study built to detect time-varying changes.
+- *Spread-based proxy* — rejected as circular.
 
-**Cause.** The aggregation counted distinct round *numbers* rather than distinct
-`(season, round)` pairs. Round 1 recurs in all 21 seasons, so `conventional`
-reported 23 — the number of distinct round numbers, not events. Team-events were
-never affected, which is why they reconciled exactly (4042+60+165+60 = 4327) and
-the join was sound.
-
-**Fix.** Count distinct `(season, round)` pairs. Two assertions added so the
-table cannot silently fail to reconcile again: event counts must equal the
-final-table event count, and team-event counts must equal the final table length.
-Corrected figures: conventional 383, sprint 6, sprint_shootout 6,
-sprint_qualifying 16 — summing to 411.
-
----
-
-## 2026-09-07 — Entry 028 — Confound 17 — uniform wet flag, source built
-
-**Question.** Can a wet-qualifying filter be applied uniformly across 2006–2026,
-rather than one that is strict from 2018 and absent before it?
-
-**Status.** SOURCE BUILT AND CHARACTERISED. **Filtering decision NOT yet made** —
-the FastF1 agreement test required by condition 2 is queued behind the 500
-calls/hour rate limit, which the Tier B race acquisition holds and which is not
-parallelised around per instruction.
-
-**Framing accepted.** The analyst's reframing is recorded because it changed the
-work: the problem was never that twelve seasons lack a wet filter. It was that
-applying §6.1 as written yields a **time-varying exclusion rule inside a study
-built to detect time-varying changes** — the same failure class as Finding B and
-D1b, but self-inflicted. Uniform in both eras, or absent in both.
-
-**Built.** Circuit coordinates and qualifying date from Jolpica; precipitation
-from the Open-Meteo historical reanalysis archive. Non-circular by construction.
-412 of 422 events have data; the 10 without are unraced 2026 rounds, recorded as
-`future_session`.
-
-**Condition 3 — resolution, stated plainly.** Qualifying *date* is available for
-100% of events in all 21 seasons. Qualifying *time* is available **only from
-2022**. A session-window flag is therefore impossible before 2022 and would
-recreate the same cliff at a different year. The flag is **whole-day
-precipitation at the venue on the qualifying date**, applied identically to every
-season. A fixed local-time afternoon window was considered and **rejected**: it
-is uniform in rule but not in accuracy, because night qualifying sessions grow as
-a share of the calendar across the study window, so its error rate would drift
-with time — reintroducing the failure class through the calendar.
-
----
-
-## 2026-09-07 — Entry 029 — Confound 17 — three problems found
-
-**Status.** Recorded ahead of the formal validation, because they bear on it.
-
-**1. Over-flagging.** 33.6% of events flagged at daily ≥ 1.0 mm, 40.8% at
-≥ 0.5 mm, 15.6% at ≥ 5.0 mm. Genuinely wet or mixed F1 qualifying is a small
-minority of sessions; a third is trace and overnight rain counted as wet.
-
-**2. Condition 5 — heavy season-level clustering.** At ≥ 1.0 mm: 2018 flags
-71.4%, 2010 57.9%, 2017 50.0%, against 2026 at 7.7%. At ≥ 5.0 mm: 2010 42.1% and
-2018 33.3% against **0.0%** for both 2007 and 2025. Not noise around a constant
-rate. 2010 and 2018 both sit inside boundary windows.
-
-**3. The date field is the SCHEDULED date, not the actual date — and it fails
-hardest where it matters most.** Both of the two highest-precipitation events in
-the dataset were hand-verified (condition 4) and both were postponed *because of*
-the weather being detected:
-
-- **2019 r17 Suzuka, 134.4 mm — the highest in the dataset. FALSE POSITIVE.**
-  All Saturday running on 12 October was cancelled for Typhoon Hagibis;
-  qualifying ran Sunday 13 October **in dry conditions**. The flag reports the
-  wettest session in the study for a session that was dry.
-- **2015 r16 Austin, 91.7 mm — TRUE POSITIVE, WRONG DAY.** Saturday qualifying
-  was abandoned; the session ran Sunday 25 October with Q3 cancelled by rain.
-  Genuinely wet, but on a different day from the one measured. Correct by
-  coincidence.
-
-This is structural, not two unlucky cases: sessions are postponed *because of*
-severe weather, so the date field is systematically least reliable on exactly the
-events a wet filter exists to catch, and the error correlates with the quantity
-being measured.
-
-**What the source gets right.** The high end is credible — Suzuka 2019 and 2010,
-Austin 2015, Monza 2008 and 2017, Sochi 2021, Styria 2020, Imola 2022, Interlagos
-2010. The reanalysis measures real rain at the right venues on the right
-weekends. The failure is resolution and date accuracy, not meteorology.
-
-**Preliminary assessment, explicitly not a decision.** Three independent problems
-point the same way. If the FastF1 agreement rate is poor, the pre-agreed fallback
-applies: no wet filtering in either era, stated as a limitation, wet-session
-contamination added to the confound list. A filter that is wrong on the wettest
+**Deciding argument.** The date-accuracy failure is not a resolution problem that
+a better threshold could fix. Sessions are postponed **because of** severe
+weather, so the scheduled date is systematically wrong on exactly the events a
+wet filter exists to catch, and the error **correlates with the quantity being
+measured**. Suzuka 2019 — the highest-precipitation event in the entire dataset
+at 134.4 mm — is a confirmed false positive: Saturday was cancelled for Typhoon
+Hagibis and qualifying ran dry on Sunday. A filter that is wrong on the wettest
 event in the study is worse than no filter, because it removes real sessions
 while claiming rigour.
 
+**Condition-2 validation deliberately NOT run.** The analyst directed that the
+FastF1 agreement test be skipped: the decision does not hinge on it and it costs
+rate-limit quota needed for Tier B acquisition. Recorded so the audit trail shows
+this was a decision, not an omission.
+
+**Consequences.**
+1. Wet-session contamination is **unfiltered in Tier A** and enters the
+   confound list as confound 18.
+2. The contamination is **not randomly distributed** across seasons or circuits,
+   so it is not white noise that averages out.
+3. The Open-Meteo module stays in the repository, **unused**, with its failure
+   written up. A rejected approach with a diagnosis is worth more than silence,
+   and it stops the same idea being re-attempted from scratch later.
+
 ---
 
-## 2026-09-07 — Entry 030 — Correction to an Entry 024 claim
+## 2026-09-07 — Entry 032 — R6 redefined
 
-**Question.** Entry 024 (defect 3) stated that Austin 2015's Q1/Q2 observations
-"are adjusted on the same basis as every other event and carry no special
-measurement status." Is that right?
+**Question.** R6 was "wet sessions in / out," which presupposes a wet flag that
+now does not exist.
 
-**Status.** **CORRECTED. It was wrong.**
+**Status.** DECIDED — redefined.
 
-**What is wrong.** Austin 2015 qualifying ran on Sunday 25 October in wet
-conditions, with Q3 cancelled by worsening rain. Its Q1 and Q2 observations are
-**wet-session observations** and do not share a measurement basis with dry
-events.
+**Option chosen.** R6 becomes **sensitivity to excluding a small set of
+hand-verified wet qualifying sessions**, confirmed individually from
+contemporaneous sources, rather than a threshold sweep over a systematic flag.
 
-**What stands.** The L3 fallback *flag* was a genuine bug and its fix is correct:
-the flag fired when an offset could not be estimated even where that offset was
-not needed. Zero fallbacks remain. What does not stand is the reassurance
-appended to it.
+**Confirmed members at time of writing:** 2015 r16 United States Grand Prix
+(qualifying postponed to Sunday, Q3 cancelled by rain, pole set on a Q2 time).
+Others are added only when confirmed from contemporaneous reporting and named
+individually in the memo.
 
-**Why recorded.** The claim was made in a committed ledger and in a commit
-message. Correcting it in the ledger only, without an entry, would leave the
-audit trail asserting something known to be false.
+**Reason.** A hand-verified list is small, auditable, and honest about its own
+incompleteness. A systematic flag would be larger, appear more rigorous, and be
+wrong in a way that correlates with the outcome. R6 can no longer claim to test
+sensitivity to *all* wet sessions and does not pretend to; it tests sensitivity
+to the ones we can name.
+
+---
+
+## 2026-09-07 — Entry 033 — Process and environment changes
+
+**Question.** Two operational failures and a scope change to how work proceeds.
+
+**Status.** DECIDED.
+
+**1. Shell text-processing banned.** Time and correctness were lost three times
+to Git Bash quoting: heredocs failing twice, and an `awk '$1>1'` parsed as a
+redirect that created a stray file *and* silently duplicated seven ledger
+entries. A later duplication of entries 27–30 was committed in 3bbd4b7 before
+being caught.
+
+**Rule going forward:** no shell heredocs, no inline quoted awk/sed. Files are
+written with the editor tool; text processing lives in Python modules under
+`src/`. Shell is used only for git, running Python modules, and simple
+inspection.
+
+**2. Ledger reconciliation now fails loudly.** `src/ledger.py` is the only path
+that mutates `DECISIONS.md`. It enforces on every append that entry numbers are
+unique, contiguous from 1, in order, and that the post-append count equals the
+pre-append count plus entries added. A failed append restores the file to its
+pre-append content and raises. It caught the committed 27–30 duplication on its
+first run, and its `repair` command refuses to act when duplicate blocks differ
+in content rather than silently discarding one.
+
+**3. Execution proceeds without approval checkpoints.** The analyst has directed
+that design decisions are settled and what remains is execution. Tier B
+acquisition, the Tier B ledger, the Finding E compound test, the Phase 3 pace
+model with all §4.4 ship gates, and Phase 4 metrics including D1c all run
+straight through. Findings are written up, logged here, committed, and the work
+continues.
+
+Work stops and returns to the analyst for only three things: Decision A
+thresholds, Decision B primary metric freeze, and anything that **invalidates a
+committed plan decision**. A finding that changes interpretation is recorded and
+does not stop the run; only one that blocks the next step does.
