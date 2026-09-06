@@ -11,6 +11,7 @@ No filtering happens here. This is acquisition only; Phase 2 owns exclusions.
 
 from __future__ import annotations
 
+import time
 import warnings
 
 import fastf1
@@ -18,8 +19,20 @@ import pandas as pd
 
 from src import config
 
+try:
+    from fastf1.req import RateLimitExceededError
+except ImportError:  # pragma: no cover - defensive across fastf1 versions
+    class RateLimitExceededError(Exception):  # type: ignore[no-redef]
+        pass
+
 fastf1.Cache.enable_cache(str(config.FASTF1_CACHE))
 warnings.filterwarnings("ignore")
+
+# The live timing API allows 500 calls/hour and a session load costs several.
+# A cached session costs none, so re-runs resume for free; we only ever wait
+# for sessions not yet on disk.
+RATE_LIMIT_SLEEP_S = 900
+RATE_LIMIT_MAX_WAITS = 16
 
 KEEP = [
     "Driver", "DriverNumber", "Team", "LapNumber", "LapTime", "Stint",
@@ -65,8 +78,22 @@ def main() -> None:
             rec = {"season": season, "round": rnd, "event": name,
                    "event_format": fmt, "status": "", "n_laps": 0, "error": ""}
             try:
-                s = fastf1.get_session(season, rnd, "R")
-                s.load(laps=True, telemetry=False, weather=True, messages=False)
+                s = None
+                for wait_n in range(RATE_LIMIT_MAX_WAITS + 1):
+                    try:
+                        s = fastf1.get_session(season, rnd, "R")
+                        s.load(laps=True, telemetry=False, weather=True, messages=False)
+                        break
+                    except RateLimitExceededError:
+                        if wait_n == RATE_LIMIT_MAX_WAITS:
+                            raise
+                        print(
+                            f"{season} r{rnd:<2} rate limited; sleeping "
+                            f"{RATE_LIMIT_SLEEP_S // 60} min "
+                            f"(wait {wait_n + 1}/{RATE_LIMIT_MAX_WAITS})",
+                            flush=True,
+                        )
+                        time.sleep(RATE_LIMIT_SLEEP_S)
                 laps = s.laps
                 if laps is None or not len(laps):
                     rec["status"] = "no_laps"
