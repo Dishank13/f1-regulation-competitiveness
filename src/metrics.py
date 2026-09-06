@@ -66,9 +66,30 @@ def teammate_delta(drivers: pd.DataFrame) -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
-def build() -> tuple[pd.DataFrame, pd.DataFrame]:
-    teams = pd.read_parquet(config.DATA_PROCESSED / "tier_a_team_event.parquet")
-    drivers = pd.read_parquet(config.DATA_PROCESSED / "tier_a_driver_event.parquet")
+def load_tier(tier: str) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """Return (team-event, driver-event) tables with a common schema.
+
+    Tier A is qualifying pace; Tier B is fuel- and tyre-corrected race pace.
+    Both carry `delta` = % off the fastest team at that event, so M1-M7 are
+    computed by identical code and the two tiers measure the same construct.
+    """
+    if tier == "a":
+        teams = pd.read_parquet(config.DATA_PROCESSED / "tier_a_team_event.parquet")
+        drivers = pd.read_parquet(
+            config.DATA_PROCESSED / "tier_a_driver_event.parquet")
+        return teams, drivers
+
+    teams = pd.read_parquet(config.DATA_PROCESSED / "pace_team_best.parquet")
+    teams = teams.rename(columns={"team": "team_continuity"})
+    coefs = pd.read_parquet(config.DATA_PROCESSED / "pace_coefs.parquet")
+    coefs = coefs.rename(columns={"team": "team_continuity"})
+    coefs["best_event"] = coefs.groupby(["season", "round"])["gamma"].transform("min")
+    coefs["delta"] = 100 * (coefs.gamma / coefs.best_event - 1)
+    return teams, coefs
+
+
+def build(tier: str = "a") -> tuple[pd.DataFrame, pd.DataFrame]:
+    teams, drivers = load_tier(tier)
 
     ev = (teams.groupby(["season", "round"]).apply(event_metrics, include_groups=False)
           .reset_index())
@@ -144,16 +165,27 @@ def d1c(ev: pd.DataFrame) -> pd.DataFrame:
 
 
 def main() -> None:
-    ev, season = build()
-    ev.to_parquet(config.DATA_PROCESSED / "tier_a_event_metrics.parquet", index=False)
-    season.to_parquet(config.DATA_PROCESSED / "tier_a_season_metrics.parquet",
+    import sys
+    tier = sys.argv[1].lower() if len(sys.argv) > 1 else "a"
+    ev, season = build(tier)
+    ev.to_parquet(config.DATA_PROCESSED / f"tier_{tier}_event_metrics.parquet",
+                  index=False)
+    season.to_parquet(config.DATA_PROCESSED / f"tier_{tier}_season_metrics.parquet",
                       index=False)
+    print(f"### TIER {tier.upper()} ###")
 
     pd.set_option("display.width", 200)
     print("=== SEASON-LEVEL METRICS (median across events, % off fastest) ===")
     show = ["season", "n_events", "M1_sd", "M2_iqr", "M3_midfield_pct",
             "M4_frontgap_pct", "M5_front_pair", "M6_backmarker", "M7_teammate"]
     print(season[show].round(3).to_string(index=False))
+
+    if tier != "a":
+        # D1c is a Tier A test by construction: the 2010 boundary predates the
+        # Tier B window entirely. Running it here would write NaNs over the
+        # Tier A result.
+        print("\n(D1c skipped: it is a Tier A test; 2010 predates Tier B.)")
+        return
 
     print("\n=== D1c — front-of-field step at 2010 (pre-committed rule) ===")
     d = d1c(ev)

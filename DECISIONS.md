@@ -1114,3 +1114,167 @@ events would not fix it.
 
 **Consequence.** M5 should not be selected as primary for any analysis spanning
 the recent era. Recorded for the Decision B package.
+## 2026-09-07 — Entry 038 — Tier B acquisition: one genuine data gap
+
+**Question.** Did Tier B acquisition complete, and are all failures accounted for?
+
+**Status.** COMPLETE. 185 of 196 sessions loaded.
+
+**Failures, all logged by the acquisition ledger rather than skipped silently:**
+- **10 are unraced 2026 rounds** (14–23). Scheduled, not yet run. Not a data gap.
+- **1 is genuine: 2018 r14 Italian Grand Prix.** The source API returns "Failed
+  to load timing data". Reproduced on a direct retry, so it is an upstream gap,
+  not a transient error and not a rate-limit casualty. 2018 therefore contributes
+  20 of 21 races.
+
+**Rate limiting.** The 500 calls/hour limit was honoured with cache-first resume
+and no parallelisation. One accidental second process was started and killed
+immediately.
+
+---
+
+## 2026-09-07 — Entry 039 — Tier B cleaning: Spa 2021 lost, and logged
+
+**Question.** One session vanished between the session baseline and the final
+Tier B table. Which, and why?
+
+**Status.** RESOLVED and now logged by name.
+
+**Finding.** **2021 r12 Belgian Grand Prix.** 60 raw laps, 20 drivers,
+rainfall=True. This is the race that ran a handful of laps behind the safety car
+in torrential rain before being declared. After the structural filters it
+retained **no representative lap**, which is correct — there was no green-flag
+racing to measure.
+
+**Fix.** A session-track close-out row now names any session that loses every
+lap, rather than letting it disappear between two counts. Same defect class as
+the Tier A Miami event (Entry 024) and caught by applying the same reconciliation
+discipline.
+
+---
+
+## 2026-09-07 — Entry 040 — Traffic filter is the dominant exclusion, and its proxy is imperfect
+
+**Question.** How much does the traffic filter remove, and is the gap measure sound?
+
+**Status.** RECORDED. Bears directly on Decision A.
+
+**Finding 1 — dominance.** L8 removes **19.5%** of surviving laps, more than any
+other filter except track status. It is also the most threshold-sensitive knob in
+the pipeline: 0.5 s keeps 90.6% of the base, 1.0 s keeps 77.6%, 2.0 s keeps
+59.0%. A third of the Tier B data rides on this single choice.
+
+**Finding 2 — the proxy is imperfect, measured not assumed.** `Position` is race
+classification, not track position, so for lapped or out-of-sequence cars the car
+"ahead" by Position can have a *later* lap start time, producing a negative gap.
+This affects **6.36%** of non-null gaps (1st percentile −13.5 s). Negative gaps
+fail the `>= threshold` comparison and are dropped, so they are removed rather
+than mis-signed — but that means the traffic filter removes a small, non-random
+set of laps for a reason unrelated to traffic.
+
+**Recorded as confound 19.** Not fatal, but it means the traffic filter is doing
+slightly more than it claims, and the excess is concentrated on lapped cars,
+which are disproportionately backmarkers — i.e. it is not neutral with respect to
+the dispersion being measured.
+
+---
+
+## 2026-09-07 — Entry 041 — Pace model ships: all four gates pass
+
+**Question.** Does the Phase 3 pace model clear the §4.4 ship gates?
+
+**Status.** **YES on all four.** The model ships.
+
+**Gate 1, residual structure.** Residual slopes: +0.00010 against fitted value,
++0.00143 s/lap against lap number, +0.00110 s/lap against tyre age. The leftover
+fuel slope is 2.4% of the fuel coefficient itself. Binned medians visually flat.
+
+**Gate 2, fit quality.** 180/184 races fitted. Residual SD median 0.544 s,
+pseudo-R² median 0.809. The fuel coefficient is **negative in every race**, median
+−0.059 s/lap — estimated, not imposed, and it landed in the range normally quoted.
+
+**Gate 3, recovered order.** Median Spearman ρ 0.855 against qualifying order and
+0.891 against finishing order.
+
+**Gate 4, backmarker sanity.** Fastest-team counts: Brackley 69, Red Bull 63,
+McLaren 28, Ferrari 19, Silverstone 1. **No backmarker is ever ranked fastest.**
+The single Silverstone race is Monaco 2023, where Aston Martin finished second —
+plausible, not a failure.
+
+**Rank deficiency diagnosed and fixed.** 12 races originally failed with a
+singular design. Cause: a compound used on only a handful of laps gives a dummy
+and an age-slope term that are effectively collinear. Compounds with fewer than
+10 laps in a race are now dropped, costing 166 laps across 31 races and
+recovering 8 of the 12. Four remain excluded and are logged.
+
+---
+
+## 2026-09-07 — Entry 042 — Gate 3 needed both comparators, and that mattered
+
+**Question.** The first gate-3 run used only the finishing-order comparator and
+flagged 6 races below ρ 0.5. Were those model failures?
+
+**Status.** **No — the comparator was noisy, not the model.**
+
+**Finding.** Plan §4.4 requires comparison against both the qualifying order and
+the finishing order. Only the second had been implemented. Adding the first
+resolved 5 of the 6 flags:
+
+| race | ρ vs quali | ρ vs finish |
+|---|---:|---:|
+| 2019 Brazilian GP | 0.648 | 0.371 |
+| 2020 Austrian GP | 0.927 | 0.415 |
+| 2020 Italian GP | 0.758 | 0.200 |
+| 2024 Miami GP | 0.842 | 0.486 |
+| 2025 Monaco GP | 0.915 | 0.406 |
+
+All five are races where the finishing order was scrambled by safety cars,
+penalties or retirements. The model recovers a pace order consistent with
+qualifying in every one.
+
+**One race fails both comparators:** 2022 Emilia Romagna (0.43 / 0.32), a wet
+race. Under Amendment 3 wet sessions are not filtered, so it stays in and is
+named rather than quietly dropped.
+
+**Lesson recorded.** Had gate 3 shipped with one comparator, five sound races
+would have been investigated as model failures — or worse, the model would have
+been "fixed" to match a scrambled finishing order.
+
+---
+
+## 2026-09-07 — Entry 043 — M5 measurement floor confirmed independently in Tier B
+
+**Question.** Entry 037 found M5 at or below the M7 driver-noise floor in Tier A.
+Does race pace show the same?
+
+**Status.** **Yes — independently confirmed.**
+
+**Finding.** In Tier B, M5 sits at or below M7 in most seasons: 2018 M5 = 0.151
+against M7 = 0.237; 2022 M5 = 0.134 against M7 = 0.357; 2026 M5 = 0.268 against
+M7 = 0.275.
+
+Because Tier A measures qualifying and Tier B measures fuel-corrected race pace
+through an entirely separate pipeline, this is corroboration rather than an
+artefact of the qualifying metric. **M5 should not be selected as primary in
+either tier.** Carried into the Decision B package.
+
+---
+
+## 2026-09-07 — Entry 044 — Self-inflicted bug: Tier B run clobbered Tier A D1c
+
+**Question.** Recorded because it briefly corrupted a committed result.
+
+**Status.** FIXED.
+
+**What happened.** `src/metrics.py` was parameterised by tier, but the D1c block
+wrote to a fixed filename. Running the Tier B metrics overwrote
+`d1c_results.parquet` — the Tier A D1c output, which carries the pre-committed
+M4 restriction — with NaNs, because 2010 predates the Tier B window entirely.
+
+**Fix.** D1c is now explicitly guarded as a Tier A test and returns before
+writing when run under any other tier. Tier A was re-run and the result restored
+identically: M4 shift +0.827 [0.643, 1.118], restriction still triggered.
+
+**Why it is logged.** The corrupted file would have silently replaced a
+pre-committed diagnostic with nulls. Nothing downstream had consumed it yet, but
+the same class of error later would be invisible.

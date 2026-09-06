@@ -33,11 +33,26 @@ from src import config
 
 MIN_LAPS_FOR_FIT = 40      # per race, across all drivers
 MIN_DRIVERS_FOR_FIT = 8
+# A compound used for only a handful of laps in a race gives a dummy and an
+# age-slope term that are effectively collinear, making the design singular.
+# Diagnosed empirically: the 12 rank-deficient races all contained a compound
+# with 1-9 laps (e.g. SOFT on 1 lap at Brazil 2021, INTERMEDIATE on 1 at Imola
+# 2022). Those laps are dropped rather than the whole race being discarded.
+MIN_LAPS_PER_COMPOUND = 10
 
 
 def fit_race(g: pd.DataFrame) -> tuple[pd.DataFrame | None, dict]:
     """Fit one race. Returns (driver coefficients, diagnostics)."""
-    diag = {"n_laps": len(g), "n_drivers": g.Driver.nunique(), "status": ""}
+    diag = {"n_laps_in": len(g), "n_drivers": g.Driver.nunique(), "status": ""}
+
+    counts = g["Compound"].value_counts()
+    thin = counts[counts < MIN_LAPS_PER_COMPOUND].index.tolist()
+    if thin:
+        g = g[~g["Compound"].isin(thin)]
+    diag["compounds_dropped"] = ",".join(map(str, thin))
+    diag["laps_dropped_thin_compound"] = int(diag["n_laps_in"] - len(g))
+    diag["n_laps"] = len(g)
+
     if len(g) < MIN_LAPS_FOR_FIT or g.Driver.nunique() < MIN_DRIVERS_FOR_FIT:
         diag["status"] = "too_few_laps"
         return None, diag
@@ -124,7 +139,7 @@ def team_pace(coefs: pd.DataFrame, mode: str = "best") -> pd.DataFrame:
 
 
 def ship_gates(coefs: pd.DataFrame, diags: pd.DataFrame,
-               laps: pd.DataFrame) -> pd.DataFrame:
+               laps: pd.DataFrame, quali: pd.DataFrame | None = None) -> pd.DataFrame:
     """Plan 4.4 gates 2 and 3, plus the gate-4 backmarker check."""
     t = team_pace(coefs)
     rows = []
@@ -138,8 +153,22 @@ def ship_gates(coefs: pd.DataFrame, diags: pd.DataFrame,
         m = m.dropna()
         rho = (stats.spearmanr(m["delta"], m["finish"]).statistic
                if len(m) >= 4 else np.nan)
+
+        # Gate 3(a): recovered race pace vs that event's QUALIFYING order.
+        # A better comparator than finishing order, which incidents scramble.
+        rho_q = np.nan
+        if quali is not None:
+            q = quali[(quali.season == season) & (quali["round"] == rnd)]
+            if len(q):
+                mq = (g.set_index("team")["delta"].to_frame("race")
+                      .join(q.set_index("team_continuity")["delta"]
+                            .rename("quali")).dropna())
+                if len(mq) >= 4:
+                    rho_q = stats.spearmanr(mq["race"], mq["quali"]).statistic
+
         rows.append({"season": season, "round": rnd,
                      "event": g["event"].iloc[0],
+                     "rho_vs_quali": rho_q,
                      "rho_vs_finish": rho,
                      "n_teams": len(g),
                      "fastest_team": g.loc[g.delta.idxmin(), "team"]})
@@ -167,12 +196,23 @@ def main() -> None:
         .round(3).to_string(index=False))
 
     print("\n=== GATE 3: recovered pace order vs finishing order ===")
-    g = ship_gates(coefs, diags, laps)
-    print(f"median Spearman rho = {g.rho_vs_finish.median():.3f}")
-    bad = g[g.rho_vs_finish < 0.5]
-    print(f"races with rho < 0.5 (flagged for investigation): {len(bad)}")
+    try:
+        quali = pd.read_parquet(config.DATA_PROCESSED / "tier_a_team_event.parquet")
+    except Exception:
+        quali = None
+    g = ship_gates(coefs, diags, laps, quali)
+    print(f"median rho vs QUALIFYING order = {g.rho_vs_quali.median():.3f}")
+    print(f"median rho vs FINISHING order  = {g.rho_vs_finish.median():.3f}")
+    # Plan 4.4 gate 3: flag only if BOTH comparators are weak.
+    bad = g[(g.rho_vs_finish < 0.5) & ((g.rho_vs_quali < 0.5) | g.rho_vs_quali.isna())]
+    print(f"races failing BOTH comparators (rho < 0.5): {len(bad)}")
     if len(bad):
-        print(bad[["season", "round", "event", "rho_vs_finish"]]
+        print(bad[["season", "round", "event", "rho_vs_quali", "rho_vs_finish"]]
+              .round(3).to_string(index=False))
+    onlyfin = g[(g.rho_vs_finish < 0.5) & (g.rho_vs_quali >= 0.5)]
+    print(f"races weak vs finishing order but FINE vs qualifying: {len(onlyfin)}")
+    if len(onlyfin):
+        print(onlyfin[["season", "round", "event", "rho_vs_quali", "rho_vs_finish"]]
               .round(3).to_string(index=False))
 
     print("\n=== GATE 4: fastest-team sanity ===")
