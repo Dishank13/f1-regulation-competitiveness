@@ -1,5 +1,23 @@
 # Did F1's regulation resets actually close up the field?
 
+**No. Across five technical regulation boundaries from 2006 to 2026, none shows
+the field narrowing beyond its existing trend — and three of the five show it
+widening. The field did converge steadily over two decades, but that convergence
+happened between the resets, not at them.**
+
+The one reset that explicitly promised a closer field — the 2021–22 cost cap and
+ground-effect package — produced no measurable narrowing under any of three
+specifications. The five boundaries do not share a common effect (I² = 86%), so
+the per-boundary result is the finding and the pooled estimate is not.
+
+Read [`memo.md`](memo.md) for the full result and
+[`LIMITATIONS.md`](LIMITATIONS.md) for what would change it. The most important
+caveat is in the memo's first paragraph: this measures *field convergence*, and
+F1 mostly promises *raceability*. They are different things, and every null here
+is consistent with the regulations succeeding at what they actually aimed for.
+
+---
+
 Formula 1 rewrites its technical regulations every few years, and each time the
 stated goal is closer racing. This project tests whether that happened, using
 timing data rather than the two measures usually reached for. Championship points
@@ -14,33 +32,42 @@ design is as much the deliverable as the answer.
 
 ## Status
 
-**In progress. No results yet.**
-
-Current phase: **Phase 0 — analysis plan under review.** No data has been
-acquired and no analysis code has been written.
+**Analysis complete. Phases 0–7 delivered.**
 
 | Phase | State |
 |---|---|
-| 0 — Analysis plan (pre-registration) | Drafted, under review |
-| 1 — Acquisition and coverage report | Not started |
-| 2 — Cleaning and representative-lap filter | Not started |
-| 3 — Pace model | Not started |
-| 4 — Competitiveness metrics | Not started |
-| 5 — Reset analysis | Not started |
-| 6 — Red team and robustness battery | Not started |
-| 7 — Memo and deliverables | Not started |
+| 0 — Analysis plan (pre-registration) | Committed and tagged before any code |
+| 1 — Acquisition and coverage report | Complete |
+| 2 — Cleaning and row-loss ledgers | Complete |
+| 3 — Pace model | Complete; all four ship gates pass |
+| 4 — Competitiveness metrics | Complete |
+| 5 — Reset analysis | Complete |
+| 6 — Red team and robustness battery | Complete |
+| 7 — Memo and deliverables | Complete |
 
-## Finding
+The plan carries four amendments, each a separate commit stating what changed and
+why. The `pre-registration` tag has never moved. 58 decisions are logged in
+[`DECISIONS.md`](DECISIONS.md), append-only.
 
-<!-- PLACEHOLDER — to be filled from memo.md once Phase 5 and the Phase 6
-     robustness battery are complete. Nothing goes here until then, including
-     partial or preliminary results. -->
+## Headline numbers
 
-_Not yet available._ This section will state the finding in the first sentence,
-carried over from `memo.md`, once the analysis has run and survived the
-robustness checks in section 11 of the analysis plan. A claim that survives
-fewer than 8 of the 12 robustness checks will be labelled "suggestive" rather
-than "finding," in those words.
+Primary metric M2 (robust field spread), segmented interrupted time series.
+Positive = the field widened at the reset.
+
+| boundary | level change | 95% CI | survives Holm |
+|---|---:|---|:---:|
+| 2009 | **+0.973** | [+0.633, +1.382] | yes |
+| 2014 | +0.449 | [+0.062, +0.849] | no |
+| 2017 | +0.133 | [−0.113, +0.382] | no |
+| 2021–22 | −0.003 | [−0.455, +0.343] | no |
+| 2026 (provisional) | **+0.834** | [+0.621, +1.073] | yes |
+
+Pooled: +0.480 [−0.046, +1.007], p = 0.064 against a Holm threshold of 0.025 —
+**does not reject**. Two pre-registered falsification criteria fire independently.
+
+29% of the 2026 widening is attributable to the eleventh constructor joining that
+season; the constant-constructor estimate is +0.596 [+0.388, +0.813]. 2026 covers
+13 of 23 rounds and is provisional.
 
 ## Method
 
@@ -99,13 +126,20 @@ pip install -r requirements.txt
 make all
 ```
 
-`make all` rebuilds every intermediate table from scratch. Raw API responses are
-cached locally and are not committed; the cache is populated on first run and
-reused afterwards. Processed tables are written to `data/processed/` as Parquet,
-each accompanied by a data dictionary that is committed. Random seeds for all
-bootstraps are fixed and recorded.
+`make all` rebuilds every intermediate table from scratch. `make analysis` runs
+everything downstream of acquisition with no network access. `make verify` checks
+the decision ledger for duplicated or non-contiguous entries and fails loudly if
+either is present.
 
-The pipeline does not exist yet. This section documents the intended entry point.
+Raw API responses are cached locally and are not committed; the cache is
+populated on first run and reused afterwards. Acquisition is rate-limited
+upstream at 500 calls/hour and resumes from cache, so a re-run costs nothing for
+sessions already on disk. Processed tables are written to `data/processed/` as
+Parquet; the reports and ledgers in that directory are committed, the Parquet is
+not. Random seeds for all bootstraps are fixed and recorded.
+
+`make findinge` runs the Q2 starting-tyre test. It is slow, rate-limited, and not
+required for the headline result.
 
 ## Data sources
 
