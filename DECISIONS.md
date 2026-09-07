@@ -1278,3 +1278,158 @@ identically: M4 shift +0.827 [0.643, 1.118], restriction still triggered.
 **Why it is logged.** The corrupted file would have silently replaced a
 pre-committed diagnostic with nulls. Nothing downstream had consumed it yet, but
 the same class of error later would be invisible.
+## 2026-09-07 — Entry 045 — A — traffic gap: circular baseline found, re-estimated
+
+**Question.** What gap to the car ahead counts as clean air?
+
+**Status.** DECIDED — **5.0 s**, by a rule pre-committed before the output was seen.
+
+**The defect.** My first traffic curve used each stint's median lap at
+`gap >= 3 s` as the clean-air baseline. That forces every bin at or beyond 3 s to
+zero **by construction**. The table did not show the penalty reaching zero at
+3.0 s; it assumed it. Caught by the analyst.
+
+**Re-estimated** against a distant baseline — stint median at `gap >= 8 s`,
+requiring at least 3 reference laps — with bins extended to 8 s. The circular
+version understated the 1 s penalty by **42%**: +0.38 s against a true +0.65 s.
+
+| gap (s) | median penalty (s) |
+|---|---:|
+| 0.75–1.00 | +0.811 |
+| 1.00–1.25 | +0.653 |
+| 1.50–2.00 | +0.418 |
+| 2.00–2.50 | +0.236 |
+| 3.00–3.50 | +0.120 |
+| 4.00–5.00 | +0.064 |
+| **5.00–6.00** | **+0.039** |
+| 6.00–7.00 | +0.031 |
+
+**Pre-committed rule** (analyst, fixed before the curve was seen): the smallest
+gap at which the residual median penalty falls below 0.05 s against the distant
+baseline; if that lands above 3.0 s, use the higher value and do not prefer 3.0 s
+for retention. **The rule returns 5.0 s.** Taken as written.
+
+**Retention check, as required.** No race falls below the 40-lap floor at 5.0 s
+(minimum 76 laps, median 306). Team-races fall from 1,847 to 1,733 at k = 3, a
+loss of **6.17%**; the lost set is mildly skewed slow (median field rank 0.60
+against 0.56 overall), less skewed than the k = 5 case that motivated k = 3.
+
+**Reported for the analyst's trade, not decided here.** The stricter cutoff costs
+model quality. Median laps per driver-race falls from ~35 to **16**, and gate 3
+degrades from 1 race failing both comparators to **9** — three of them Monaco,
+where clean air at 5 s barely exists. Gates 1, 2 and 4 still pass. This is a real
+bias–variance trade: 5.0 s removes contamination that exceeded the signal in some
+metrics, and pays for it in estimator noise.
+
+---
+
+## 2026-09-07 — Entry 046 — A — percent off own session best
+
+**Status.** DECIDED — **107%**, unchanged from provisional.
+
+**Reason.** 107% sits at roughly the 96.5th percentile of the own-best
+distribution, at the knee where the tail begins (97th pct 107.7, 98th 111.7).
+Below it the distribution is dense — a 103% cutoff would remove 28.6% of laps,
+cutting into ordinary race pace. Above it the curve flattens. The choice is not
+knife-edge, which is the best argument for keeping the value the sport uses.
+
+---
+
+## 2026-09-07 — Entry 047 — A — minimum laps per team-race
+
+**Status.** DECIDED — **k = 3**, on anti-bias grounds.
+
+**Reason.** Low-lap team-races are disproportionately **slow** teams: median
+field rank 0.80 for under 3 laps, and 0.79 for those dropped at k = 5, against
+0.56 for all team-races. The filter selectively removes backmarkers, which
+narrows measured dispersion — the direction of the hypothesis. A threshold that
+quietly makes the field look closer is the last place to be generous.
+
+**The countervailing cost, stated as the analyst required.** Team-race pace
+estimates from 3–4 lap samples carry a median SEM of about 0.29 s against 0.13 s
+at 20+ laps. Because M1 and M2 are **dispersion** measures, measurement error
+inflates them: k = 3 trades a narrowing bias (selective backmarker removal) for a
+widening one (errors-in-variables). Recorded as confound 20.
+
+The widening bias affects the **absolute level** more than boundary comparisons,
+because the distribution of team-race sample sizes is broadly stable across
+seasons, so it largely differences out at a boundary. **R7 sweeps k**, so the
+size of the trade is measured rather than assumed.
+
+---
+
+## 2026-09-07 — Entry 048 — M5 formally retired from Decision B candidates
+
+**Question.** M5 sits at or below the M7 driver-noise floor in most seasons, in
+both tiers, through separate pipelines. Should it remain a candidate?
+
+**Status.** DECIDED — **excluded from the Decision B primary candidates.**
+
+**Option chosen.** M5 is retired as a primary candidate but **not deleted**. It
+remains computed, plotted and reported, and every M5 figure is marked as below
+the driver-noise floor wherever it appears.
+
+**Reason.** This is a resolution floor, not a power problem: the gap between the
+two fastest cars is smaller than the typical gap between two drivers in the same
+car, so no amount of additional data resolves it. A metric that cannot resolve
+its target is a **reportable result about the limits of the measurement**, which
+is why it is retained rather than dropped.
+
+**Corroborated by the placebo battery.** No boundary shift on M5 exceeds the
+placebo maximum anywhere — exactly what a metric operating below its resolution
+floor looks like.
+
+---
+
+## 2026-09-07 — Entry 049 — M4 restriction is wider than first stated
+
+**Question.** The D1c restriction withdraws M4 estimates spanning 2010. Which
+boundaries does that actually cost?
+
+**Status.** RECORDED — the restriction costs the 2009 boundary as well.
+
+**Finding.** The 2009 boundary's estimation window is 2006–2013, which contains
+2010 in its post-period. Under the Entry 021 restriction, **M4 cannot carry the
+2009 boundary either** — not only cross-2010 comparisons in the narrow sense.
+M4 survives for 2014 onward.
+
+This matters because 2009 is the least contaminated boundary in the study
+(§8.5). Any metric that forfeits it forfeits the cleanest natural experiment
+available, and that is now a cost attached to M4 specifically.
+
+---
+
+## 2026-09-07 — Entry 050 — Placebo battery run across all nine control boundaries
+
+**Question.** Plan §8.4 asks for the full placebo distribution, not a single
+boundary. How large are ordinary season-to-season shifts?
+
+**Status.** RUN. Reported, not interpreted — Decision H is the analyst's.
+
+**Design.** Nine eligible Tier A control boundaries (2007, 2008, 2011, 2012,
+2013, 2015, 2018, 2024, 2025). **2010 is reported separately** as a
+measurement-artifact boundary and never inside the clean pool: it carries a grid
+expansion from 10 to 12 constructors with three new backmarkers, the refuelling
+ban, and the segment-eligibility change simultaneously. Letting a boundary known
+to be contaminated set the scale for everything else would be circular.
+
+**Result summary — each reset as a percentile of the placebo |shift|
+distribution:**
+
+- **M1** (placebo median 0.440, max 0.653): 2009 +0.719 exceeds all; 2026 +0.653
+  exceeds all; 2014 −0.584 at 89th; 2017 −0.263 and 2021–22 −0.390 both at 44th.
+- **M2** (median 0.186, max 0.586): 2009 and 2026 exceed all; 2014 and 2021–22 at
+  78th; 2017 at 11th.
+- **M3** (median 0.332, max 0.469): **2021–22 −0.650 exceeds all**; everything
+  else at or below the 89th.
+- **M4** (median 0.343, max 0.599): 2021–22 −0.642 and 2026 +0.612 exceed all;
+  2009 withdrawn per Entry 049.
+- **M5**: no boundary exceeds the placebo maximum anywhere.
+- **M6** (diagnostic): 2010 and 2009 exceed all — M6 doing the job it was kept
+  for, flagging grid-composition change.
+
+**Recorded for Decision H.** The placebo distribution is wide: ordinary season
+boundaries move M1 by a median of 0.44 and up to 0.65. Two of the five resets sit
+inside that ordinary range on M1. Whether a reset that moves the field no more
+than an average season counts as "no effect" is the analyst's call, and it now
+rests on nine control boundaries rather than on 2010 alone.

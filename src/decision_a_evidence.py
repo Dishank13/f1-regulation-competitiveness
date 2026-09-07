@@ -42,30 +42,65 @@ def base_laps() -> pd.DataFrame:
     return df
 
 
-def traffic_curve(df: pd.DataFrame) -> pd.DataFrame:
+BASELINE_GAP_S = 8.0
+PENALTY_THRESHOLD_S = 0.05
+
+
+def traffic_curve(df: pd.DataFrame,
+                  baseline_gap: float = BASELINE_GAP_S) -> pd.DataFrame:
     """Lap-time penalty vs gap to car ahead, within driver-stint cells.
 
     Within one driver's stint the car, tyre compound and fuel trend are fixed,
     so deviation from that stint's own clean-air baseline isolates traffic.
-    Baseline = the driver-stint's median lap time among laps with gap >= 3 s.
+
+    CIRCULARITY, and why the baseline is distant. An earlier version used
+    `gap >= 3 s` as the clean-air baseline, which forces every bin at or beyond
+    3 s to zero BY CONSTRUCTION — it assumed the answer it appeared to show.
+    The baseline is now `gap >= 8 s`, far outside the range where the cutoff
+    could plausibly fall, so bins from 0 to 8 s are estimated against reference
+    laps that are not themselves inside the candidate region.
+
+    Bins at or beyond `baseline_gap` remain zero by construction and are
+    reported as such rather than read as evidence.
     """
     d = df[df.gap_ahead_s.notna() & (df.gap_ahead_s >= 0)].copy()
     d["cell"] = (d.season.astype(str) + "_" + d["round"].astype(str) + "_"
                  + d.Driver.astype(str) + "_" + d.Stint.astype(str))
-    clean = d[d.gap_ahead_s >= 3.0].groupby("cell")["lap_s"].median()
+    ref = d[d.gap_ahead_s >= baseline_gap].groupby("cell")["lap_s"]
+    clean = ref.median()
+    n_ref = ref.size()
+    # Require at least 3 reference laps so the baseline is not one noisy lap.
+    clean = clean[n_ref >= 3]
     d["baseline"] = d["cell"].map(clean)
     d = d[d.baseline.notna()]
     d["penalty_s"] = d.lap_s - d.baseline
 
-    edges = np.array([0, 0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 2.0, 2.5,
-                      3.0, 4.0, 6.0, 10.0, 1e9])
+    edges = np.array([0, 0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 2.0, 2.5, 3.0,
+                      3.5, 4.0, 5.0, 6.0, 7.0, 8.0, 10.0, 1e9])
     d["bin"] = pd.cut(d.gap_ahead_s, edges, right=False)
     out = (d.groupby("bin", observed=True)["penalty_s"]
            .agg(n="size", median="median", q25=lambda s: s.quantile(.25),
                 q75=lambda s: s.quantile(.75)).reset_index())
     out["gap_lo"] = [iv.left for iv in out["bin"]]
     out["gap_hi"] = [min(iv.right, 999) for iv in out["bin"]]
-    return out[["gap_lo", "gap_hi", "n", "median", "q25", "q75"]].round(4)
+    out["by_construction_zero"] = out.gap_lo >= baseline_gap
+    return out[["gap_lo", "gap_hi", "n", "median", "q25", "q75",
+                "by_construction_zero"]].round(4)
+
+
+def choose_gap(curve: pd.DataFrame,
+               threshold: float = PENALTY_THRESHOLD_S) -> float:
+    """PRE-COMMITTED RULE (analyst, before the output was seen):
+
+    the smallest gap at which the residual median penalty falls below 0.05 s
+    against the DISTANT baseline. If that lands above 3.0 s, the higher value is
+    used — retention is not a tie-breaker.
+    """
+    est = curve[~curve.by_construction_zero]
+    hit = est[est["median"] < threshold]
+    if hit.empty:
+        return float(est.gap_lo.max())
+    return float(hit.iloc[0]["gap_lo"])
 
 
 def pct_curve(df: pd.DataFrame) -> pd.DataFrame:

@@ -28,11 +28,11 @@ clean.
 | L5 missing compound, stint or tyre age       | filter   | laps     |   168208 |  167310 |       898 |         0.534 | plan 6.2 step 8                                             |
 | L6 first lap of each stint                   | filter   | laps     |   167310 |  167249 |        61 |         0.036 | plan 6.2 step 7: tyre warm-up                               |
 | L7 slower than 107.0% of own session best    | filter   | laps     |   167249 |  161495 |      5754 |         3.44  | plan 6.2 step 5; Decision A pending, see sweep              |
-| L8 started within 1.0s of the car ahead      | filter   | laps     |   161495 |  130053 |     31442 |        19.469 | plan 6.2 step 6; leaders have no car ahead and are retained |
-| L9 team has fewer than 5 representative laps | filter   | laps     |   130053 |  130039 |        14 |         0.011 | Decision A pending, see sweep                               |
+| L8 started within 5.0s of the car ahead      | filter   | laps     |   161495 |   57177 |    104318 |        64.595 | plan 6.2 step 6; leaders have no car ahead and are retained |
+| L9 team has fewer than 3 representative laps | filter   | laps     |    57177 |   57088 |        89 |         0.156 | Decision A pending, see sweep                               |
 | S1 sessions losing every representative lap  | filter   | sessions |      185 |     184 |         1 |         0.541 | 2021 r12 Belgian Grand Prix (60 raw laps, rainfall=True)    |
 
-**Final:** 130,039 representative laps across 184 sessions, 2018–2026.
+**Final:** 57,088 representative laps across 184 sessions, 2018–2026.
 
 ## Sessions that lost every lap
 
@@ -60,10 +60,10 @@ Percent of the post-structural-filter base retained at each candidate value. Eac
 | traffic_gap_s     |     1   |      129827 |         77.62 |
 | traffic_gap_s     |     1.5 |      112763 |         67.42 |
 | traffic_gap_s     |     2   |       98721 |         59.03 |
-| min_laps_per_team |     3   |      129823 |         77.62 |
-| min_laps_per_team |     5   |      129813 |         77.62 |
-| min_laps_per_team |     8   |      129783 |         77.6  |
-| min_laps_per_team |    12   |      129690 |         77.54 |
+| min_laps_per_team |     3   |       56769 |         33.94 |
+| min_laps_per_team |     5   |       56525 |         33.8  |
+| min_laps_per_team |     8   |       55961 |         33.46 |
+| min_laps_per_team |    12   |       54713 |         32.71 |
 
 ### What the sweep says
 

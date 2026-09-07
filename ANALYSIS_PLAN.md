@@ -491,7 +491,7 @@ Let `N` be the number of teams at event `e`, ranked by `delta` ascending.
 | M2 | Robust field spread | `IQR(delta)` over all teams | — | Same, insensitive to one outlier team |
 | M3 | Leader-to-midfield | `median(delta)` over teams in the 30th–70th percentile of the field by `delta` | `median(delta ranks 4..7)` | How far is the midfield off the front? |
 | M4 | Front-group vs rest | `mean(delta above 20th pct) - mean(delta in fastest 20%)` | `mean(ranks 3..N) - mean(ranks 1..2)` | Is there a breakaway at the front? |
-| M5 | Front-pair gap | `delta(rank 2)` — rank-based by definition; "second-fastest team" is grid-size invariant in meaning | — | Is the fight for wins close? |
+| M5 | ~~Front-pair gap~~ **RETIRED (Amendment 4)** | `delta(rank 2)` | — | **Cannot resolve its target.** M5 sits at or below the M7 driver-noise floor in most seasons, in **both tiers through separate pipelines**. The gap between the two fastest cars is smaller than the typical gap between two drivers in the same car. This is a resolution floor, not a power problem — more data does not fix it. **Excluded from the Decision B primary candidates**, but retained, computed and plotted, with every M5 figure marked as below the driver-noise floor. A metric that cannot resolve its target is a reportable result about the limits of the measurement. |
 | M6 | Backmarker gap | `delta(rank N)` — grid-size sensitive by construction | — | How bad is the tail? |
 | M7 | Teammate delta | `median over t of abs(delta(d1) - delta(d2))` | — | Driver-noise floor — not a competitiveness metric but the denominator telling us what car differences are even resolvable |
 
@@ -1021,6 +1021,27 @@ identical conditions.
     Mitigation is partial: R6 tests sensitivity to the hand-verified subset we
     can name. It cannot test sensitivity to the ones we cannot.
 
+19. **Traffic-gap proxy uses classification, not track position** (Amendment 4).
+    `Position` is race classification, so for lapped or out-of-sequence cars the
+    car "ahead" can have a later lap start time, giving a negative gap on 6.36%
+    of non-null gaps. Those laps are dropped rather than mis-signed, so the
+    traffic filter removes a small non-random set of laps for a reason unrelated
+    to traffic — concentrated on lapped cars, which are disproportionately
+    backmarkers.
+20. **Errors-in-variables inflation of the dispersion metrics** (Amendment 4).
+    Decision A sets the minimum laps per team-race to 3, chosen on anti-bias
+    grounds: low-lap team-races are disproportionately slow teams, so a higher
+    threshold selectively removes backmarkers and *narrows* measured dispersion
+    — the direction of the hypothesis. The countervailing cost is real. A
+    team-race pace estimate from 3–4 laps carries a median SEM of about 0.29 s
+    against 0.13 s at 20+ laps, and because M1 and M2 are **dispersion**
+    measures, measurement error **inflates** them. So k = 3 trades a narrowing
+    bias for a widening one.
+    The widening bias affects the **absolute level** more than boundary
+    comparisons: the distribution of team-race sample sizes is broadly stable
+    across seasons, so it largely differences out at a boundary. **R7 sweeps k**,
+    so the size of the trade is measured rather than assumed. Any absolute-level
+    statement about field spread inherits this on top of confound 16.
 ---
 
 ## 11. Robustness battery (run regardless of outcome)

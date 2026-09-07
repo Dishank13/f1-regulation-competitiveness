@@ -121,7 +121,75 @@ def gate1(df: pd.DataFrame) -> None:
         print(f"  d(resid)/d({col}) = {b:+.5f}")
 
 
+METRIC_LABELS = {
+    "M1_sd": "M1 · field spread (sd)",
+    "M2_iqr": "M2 · robust spread (IQR)",
+    "M3_midfield_pct": "M3 · leader→midfield",
+    "M4_frontgap_pct": "M4 · front group vs rest",
+    "M5_front_pair": "M5 · front-pair gap",
+    "M6_backmarker": "M6 · backmarker gap",
+}
+
+
+def decision_b() -> None:
+    """Metric behaviour over time, for the Decision B package.
+
+    Question each panel answers: does this metric move at regulation
+    boundaries in a way that is distinguishable from ordinary season churn?
+    """
+    a = pd.read_parquet(config.DATA_PROCESSED / "tier_a_season_metrics.parquet")
+    b = pd.read_parquet(config.DATA_PROCESSED / "tier_b_season_metrics.parquet")
+    resets = list(config.RESET_BOUNDARIES)
+
+    fig, axes = plt.subplots(2, 3, figsize=(16, 8), sharex=True)
+    for ax, (col, label) in zip(axes.ravel(), METRIC_LABELS.items()):
+        ax.plot(a.season, a[col], "o-", color="#4C72B0", lw=1.8, ms=4,
+                label="Tier A (qualifying)")
+        ax.plot(b.season, b[col], "s--", color="#DD8452", lw=1.6, ms=4,
+                label="Tier B (race pace)")
+        if col == "M7_teammate":
+            pass
+        # Driver-noise floor: M7 from Tier A.
+        ax.plot(a.season, a["M7_teammate"], ":", color="#55A868", lw=1.4,
+                label="M7 driver-noise floor")
+        for r in resets:
+            ax.axvline(r, color="#C44E52", lw=1.0, alpha=0.55)
+        ax.axvline(2010, color="#8172B3", lw=1.0, ls="-.", alpha=0.8)
+        ax.set_title(label, fontsize=10, loc="left")
+        ax.set_ylabel("% off fastest")
+        ax.grid(alpha=0.25)
+        if col == "M5_front_pair":
+            ax.set_title(label + "  — RETIRED: below driver-noise floor",
+                         fontsize=10, loc="left", color="#C44E52")
+        if col == "M4_frontgap_pct":
+            ax.set_title(label + "  — no cross-2010 claims (D1c)",
+                         fontsize=10, loc="left", color="#C44E52")
+    axes[0, 0].legend(fontsize=8, loc="upper right")
+    for ax in axes[1]:
+        ax.set_xlabel("season")
+    for ax in axes.ravel():
+        ax.set_xticks([2006, 2010, 2014, 2018, 2022, 2026])
+        ax.set_xticklabels(["2006", "2010", "2014", "2018", "2022", "2026"])
+    fig.suptitle(
+        "Decision B — metric candidates: does each move at regulation "
+        "boundaries distinguishably from ordinary season churn?\n"
+        "Red: regulation boundaries.   Purple dash-dot: 2010, a "
+        "measurement-artifact boundary (grid 10→12 with three new backmarkers, "
+        "refuelling ban, segment eligibility).\n"
+        "Green dotted: the M7 driver-noise floor — a metric below it cannot "
+        "resolve a car effect.", fontsize=10, y=0.995)
+    fig.tight_layout(rect=(0, 0, 1, 0.93))
+    out = config.FIGURES / "decision_b_metrics.png"
+    fig.savefig(out, dpi=130)
+    plt.close(fig)
+    print(f"wrote {out}")
+
+
 def main() -> None:
+    import sys
+    if len(sys.argv) > 1 and sys.argv[1] == "decision_b":
+        decision_b()
+        return
     df = residual_frame()
     df.to_parquet(config.DATA_PROCESSED / "pace_residuals.parquet", index=False)
     print(f"residual rows: {len(df):,}")

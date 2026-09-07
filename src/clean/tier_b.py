@@ -20,10 +20,25 @@ import pandas as pd
 from src import config
 from src.clean import team_mapping
 
-# Decision A provisional values — NOT decided. The sweep below is the evidence.
-PCT_OFF_BEST = 107.0     # % of the driver's own session best
-TRAFFIC_GAP_S = 1.0      # laps started within this of the car ahead are dropped
-MIN_LAPS_PER_TEAM = 5    # below this a team has no observation at that race
+# Decision A — SET (DECISIONS.md Entries 045-047).
+#
+# PCT_OFF_BEST 107%: sits at the 96.5th percentile of the own-best distribution,
+#   right at the knee where the tail begins, with the curve flat either side.
+#
+# TRAFFIC_GAP_S 5.0: chosen by a rule pre-committed before the curve was seen —
+#   the smallest gap at which the residual median lap-time penalty falls below
+#   0.05 s against a DISTANT baseline (stint median at gap >= 8 s). The earlier
+#   3 s baseline was circular: it forced every bin at or beyond 3 s to zero by
+#   construction and understated the 1 s penalty by 42% (+0.38 s vs +0.65 s).
+#
+# MIN_LAPS_PER_TEAM 3: chosen on ANTI-BIAS grounds, not noise. Low-lap
+#   team-races are disproportionately slow teams, so a high threshold
+#   selectively removes backmarkers and narrows measured dispersion — the
+#   direction of the hypothesis. See confound 20 for the countervailing
+#   errors-in-variables cost.
+PCT_OFF_BEST = 107.0
+TRAFFIC_GAP_S = 5.0
+MIN_LAPS_PER_TEAM = 3
 
 PCT_SWEEP = (103.0, 105.0, 107.0, 110.0, 115.0)
 GAP_SWEEP = (0.0, 0.5, 1.0, 1.5, 2.0)
