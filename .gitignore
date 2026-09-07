@@ -51,5 +51,6 @@ Thumbs.db
 .idea/
 
 # Guard against a shell variable failing to expand into a literal directory.
-$SCRATCH/
-${SCRATCH}/
+# This has happened twice ($SCRATCH, $TMP); the glob catches any future case.
+$*/
+${*}/
