@@ -25,6 +25,30 @@ except ImportError:  # pragma: no cover - defensive across fastf1 versions
     class RateLimitExceededError(Exception):  # type: ignore[no-redef]
         pass
 
+try:
+    from requests.exceptions import HTTPError
+except ImportError:  # pragma: no cover
+    class HTTPError(Exception):  # type: ignore[no-redef]
+        pass
+
+
+def _is_rate_limited(exc: BaseException) -> bool:
+    """True for either rate limiter we can hit.
+
+    FastF1 throttles its own live-timing API and raises RateLimitExceededError.
+    But it ALSO makes unthrottled Ergast/Jolpica calls internally (to fill in
+    first-lap times), and those return HTTP 429 once a full acquisition gets
+    going. Found by running the pipeline from a genuinely fresh clone: the
+    live-timing limiter was handled and the Ergast 429 was not, so sessions were
+    being marked failed for a condition that just needed waiting out.
+    """
+    if isinstance(exc, RateLimitExceededError):
+        return True
+    if isinstance(exc, HTTPError):
+        resp = getattr(exc, "response", None)
+        return getattr(resp, "status_code", None) == 429
+    return False
+
 fastf1.Cache.enable_cache(str(config.FASTF1_CACHE))
 warnings.filterwarnings("ignore")
 
@@ -84,11 +108,16 @@ def main() -> None:
                         s = fastf1.get_session(season, rnd, "R")
                         s.load(laps=True, telemetry=False, weather=True, messages=False)
                         break
-                    except RateLimitExceededError:
+                    except Exception as exc:  # noqa: BLE001
+                        if not _is_rate_limited(exc):
+                            raise
                         if wait_n == RATE_LIMIT_MAX_WAITS:
                             raise
+                        which = ("live-timing"
+                                 if isinstance(exc, RateLimitExceededError)
+                                 else "Ergast/Jolpica 429")
                         print(
-                            f"{season} r{rnd:<2} rate limited; sleeping "
+                            f"{season} r{rnd:<2} rate limited ({which}); sleeping "
                             f"{RATE_LIMIT_SLEEP_S // 60} min "
                             f"(wait {wait_n + 1}/{RATE_LIMIT_MAX_WAITS})",
                             flush=True,

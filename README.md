@@ -177,6 +177,11 @@ live-timing API, which is rate limited to 500 calls/hour; it is resumable and
 cache-first, so re-running costs nothing for sessions already on disk, but the
 first full run takes several hours.
 
+Two separate rate limits apply during acquisition and both are handled by
+backing off and retrying: FastF1's own live-timing limiter, and HTTP 429 from
+Jolpica, which FastF1 calls internally to fill in first-lap times. Expect the
+first acquisition to spend a lot of its wall time asleep.
+
 Processed tables are written to `data/processed/` as Parquet. The reports,
 ledgers and [`dictionary.md`](data/processed/dictionary.md) in that directory are
 committed; the Parquet is not. Random seeds for all bootstraps are fixed and
