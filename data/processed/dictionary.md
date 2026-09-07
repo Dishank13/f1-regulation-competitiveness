@@ -8,7 +8,7 @@ Structure is read from the Parquet files; units and meaning are curated in
 `src/data_dictionary.py`. The Parquet files themselves are gitignored and
 rebuilt by `python -m src.pipeline`; this document is committed.
 
-**40 processed tables.**
+**41 processed tables.**
 
 ---
 
@@ -27,6 +27,31 @@ One row per race session attempted, with status and error. A session absent from
 | `status` | object | 100% |  | _(structural / self-describing)_ |
 | `n_laps` | int64 | 100% |  | _(structural / self-describing)_ |
 | `error` | object | 100% |  | _(structural / self-describing)_ |
+
+---
+
+## `boundary_2009_contamination.parquet`
+
+(undocumented table)
+
+**Produced by:** `(unknown)` — **2 rows, 14 columns**
+
+| column | type | non-null | units | meaning |
+|---|---|---:|---|---|
+| `boundary` | int64 | 100% |  | _(structural / self-describing)_ |
+| `metric` | object | 100% |  | _(structural / self-describing)_ |
+| `b2` | float64 | 100% | percent | ITS LEVEL change at the boundary. Positive = the field spread apart. |
+| `b3` | float64 | 100% | percent/season | ITS SLOPE change after the boundary. |
+| `se2` | float64 | 100% | percent | Bootstrap standard error of b2. |
+| `se3` | float64 | 100% | percent/season | Bootstrap standard error of b3. |
+| `b2_lo` | float64 | 100% | percent | Lower bound, 95% cluster-bootstrap interval. |
+| `b2_hi` | float64 | 100% | percent | Upper bound, 95% cluster-bootstrap interval. |
+| `b3_lo` | float64 | 100% |  | _(structural / self-describing)_ |
+| `b3_hi` | float64 | 100% |  | _(structural / self-describing)_ |
+| `n_events` | int64 | 100% |  | _(structural / self-describing)_ |
+| `n_seasons` | int64 | 100% |  | _(structural / self-describing)_ |
+| `window` | object | 100% |  | _(structural / self-describing)_ |
+| `b3_estimable` | bool | 100% |  | _(structural / self-describing)_ |
 
 ---
 
@@ -864,6 +889,6 @@ Venue precipitation on each qualifying date (Open-Meteo). RETAINED BUT UNUSED - 
 Structural or self-describing columns (indices, counts, labels, and per-table bookkeeping). Listed for completeness so the audit is honest about what is and is not curated.
 
 ```
-DriverNumber, E_back, E_front, FreshTyre, IsAccurate, LapStartTime, LapTime, M4_frontgap_top2, PitInTime, PitOutTime, Q, RESTRICTION_TRIGGERED, Sector1Time, Sector2Time, Sector3Time, abs_shift, after, age, b2_fieldwide, b2_hi_fieldwide, b2_hi_stratified, b2_lo_fieldwide, b2_lo_stratified, b2_stratified, b3_hi, b3_lo, before, boundary, change, check, ci_hi, ci_lo, circuit, circuit_retention_pct, compound, compounds_dropped, country, deg_slopes, delta_strat, era, error, event_format, exceeds_all_placebos, fitted, format_source, front_of_field, gap_hi, gap_lo, has_Compound, has_Driver, has_LapNumber, has_LapTime, has_PitInTime, has_PitOutTime, has_Stint, has_Team, has_TrackStatus, has_TyreLife, hi, holm_threshold, into_reset, k, knob, label, lap, laps, laps_dropped_thin_compound, laps_kept, laps_per_driver, lat, lo, loaded, locality, lon, mean, median, median_Q2_minus_Q1, median_Q3_minus_Q2, median_abs_reset_shift, metric, n, n_back, n_constructors_endpoint, n_constructors_in_quali, n_drivers, n_entries, n_events, n_front, n_hours, n_laps, n_laps_in, n_pairs, n_pairs_Q3_Q2, n_post, n_pre, n_seasons, n_teams, note, pace_iqr_pct, pace_spread_pct, pct_Compound, pct_Driver, pct_LapNumber, pct_LapTime, pct_PitInTime, pct_PitOutTime, pct_Stint, pct_Team, pct_TrackStatus, pct_TyreLife, pct_differ, pct_of_base, pct_rows_with_Q1, pct_rows_with_Q2, pct_rows_with_Q3, pctile_in_placebo, pit_in, pit_out, placebo_max_abs, placebo_median_abs, precip_max_hourly_mm, prev, q25, q75, quali_date, quali_rows, quali_time_available, races, reject_at_0.05, resid, result, rho_finish, rho_quali, role, rounds_with_q3, rounds_with_quali, se, shift_2010, sign_flip, size, sources_agree, status, step, teams, test, threshold_half_reset, tz, unit, value, varies, weather_status, wet, wet_hours_gt_0p1mm
+DriverNumber, E_back, E_front, FreshTyre, IsAccurate, LapStartTime, LapTime, M4_frontgap_top2, PitInTime, PitOutTime, Q, RESTRICTION_TRIGGERED, Sector1Time, Sector2Time, Sector3Time, abs_shift, after, age, b2_fieldwide, b2_hi_fieldwide, b2_hi_stratified, b2_lo_fieldwide, b2_lo_stratified, b2_stratified, b3_estimable, b3_hi, b3_lo, before, boundary, change, check, ci_hi, ci_lo, circuit, circuit_retention_pct, compound, compounds_dropped, country, deg_slopes, delta_strat, era, error, event_format, exceeds_all_placebos, fitted, format_source, front_of_field, gap_hi, gap_lo, has_Compound, has_Driver, has_LapNumber, has_LapTime, has_PitInTime, has_PitOutTime, has_Stint, has_Team, has_TrackStatus, has_TyreLife, hi, holm_threshold, into_reset, k, knob, label, lap, laps, laps_dropped_thin_compound, laps_kept, laps_per_driver, lat, lo, loaded, locality, lon, mean, median, median_Q2_minus_Q1, median_Q3_minus_Q2, median_abs_reset_shift, metric, n, n_back, n_constructors_endpoint, n_constructors_in_quali, n_drivers, n_entries, n_events, n_front, n_hours, n_laps, n_laps_in, n_pairs, n_pairs_Q3_Q2, n_post, n_pre, n_seasons, n_teams, note, pace_iqr_pct, pace_spread_pct, pct_Compound, pct_Driver, pct_LapNumber, pct_LapTime, pct_PitInTime, pct_PitOutTime, pct_Stint, pct_Team, pct_TrackStatus, pct_TyreLife, pct_differ, pct_of_base, pct_rows_with_Q1, pct_rows_with_Q2, pct_rows_with_Q3, pctile_in_placebo, pit_in, pit_out, placebo_max_abs, placebo_median_abs, precip_max_hourly_mm, prev, q25, q75, quali_date, quali_rows, quali_time_available, races, reject_at_0.05, resid, result, rho_finish, rho_quali, role, rounds_with_q3, rounds_with_quali, se, shift_2010, sign_flip, size, sources_agree, status, step, teams, test, threshold_half_reset, tz, unit, value, varies, weather_status, wet, wet_hours_gt_0p1mm, window
 ```
 

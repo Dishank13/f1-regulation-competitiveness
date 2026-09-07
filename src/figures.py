@@ -192,13 +192,21 @@ def readme_figures() -> None:
 
     # --- (a) M2 over time -----------------------------------------------------
     fig, ax = plt.subplots(figsize=(11, 5.4))
+    # 2006-2009 is measured on a different basis: Q3 was run on race fuel and is
+    # excluded there, so the two eras are not directly comparable in level.
+    ax.axvspan(2005.6, 2009.4, color="#D5D8DC", alpha=0.55, zorder=0,
+               label="2006–09: measured differently (Q3 excluded, race-fuel era)")
     for i, r in enumerate(resets):
         ax.axvline(r, color="#C0392B", lw=1.6, alpha=0.75, zorder=1,
                    label="season a new rule package took effect" if i == 0 else None)
     ax.axvline(2010, color="#7D3C98", lw=1.8, ls="-.", alpha=0.95, zorder=1,
                label="2010 — measurement changes, not a rule reset")
-    ax.plot(a.season, a.M2_iqr, "o-", color="#2B4C7E", lw=2.4, ms=6, zorder=3,
-            label="spread of car pace")
+    early = a[a.season <= 2009]
+    late = a[a.season >= 2010]
+    ax.plot(early.season, early.M2_iqr, "o--", color="#5D6D7E", lw=2.0, ms=6,
+            zorder=3, label="spread of car pace (earlier basis)")
+    ax.plot(late.season, late.M2_iqr, "o-", color="#2B4C7E", lw=2.4, ms=6,
+            zorder=3, label="spread of car pace")
     ax.set_xlabel("season")
     ax.set_ylabel("spread of car pace across the field\n(% off the fastest car)")
     ax.set_title("How far apart the cars were, 2006–2026", fontsize=13, loc="left")
@@ -219,7 +227,7 @@ def readme_figures() -> None:
         on="label")
     y = np.arange(len(m))[::-1]
 
-    fig, ax = plt.subplots(figsize=(10, 4.6))
+    fig, ax = plt.subplots(figsize=(10, 5.2))
     for off, (est, lo, hi), col, lab in (
             (+0.15, ("b2", "b2_lo", "b2_hi"), "#2B4C7E", "main method"),
             (-0.15, ("b2_stratified", "b2_lo_stratified", "b2_hi_stratified"),
@@ -229,12 +237,18 @@ def readme_figures() -> None:
                     fmt="o", color=col, ms=7, capsize=4, lw=2, label=lab)
     ax.axvline(0, color="black", lw=1.4, zorder=0)
     ax.set_yticks(y)
-    ax.set_yticklabels(m.label)
+    labels = [f"{l} ⚑" if l == "2009" else l for l in m.label]
+    ax.set_yticklabels(labels)
     ax.set_xlabel("change in field spread at the rule change\n"
                   "← cars got closer      cars spread apart →")
-    ax.set_title("What happened to the field at each rule change",
-                 fontsize=13, loc="left")
+    ax.set_title("What happened to the field at each rule change\n"
+                 "Method: trend-corrected (the pre-existing decline is removed)",
+                 fontsize=12, loc="left")
     ax.legend(fontsize=9, loc="lower right")
+    ax.annotate("⚑ 2009 is contaminated: its comparison period contains the 2010\n"
+                "   measurement change. Excluding it halves the estimate to +0.46.",
+                xy=(0.005, -0.30), xycoords="axes fraction", fontsize=8.5,
+                color="#7D3C98", va="top")
     ax.grid(axis="x", alpha=0.25)
     fig.tight_layout()
     fig.savefig(config.FIGURES / "fig2_boundary_estimates.png", dpi=140)
@@ -250,9 +264,12 @@ def readme_figures() -> None:
     ax.scatter(plac, np.zeros(len(plac)) + 0.06,
                s=90, color="#9AA5B1", edgecolor="white", zorder=3,
                label=f"ordinary seasons, no rule change (n={len(plac)})")
-    colors = ["#C0392B" if s > 0 else "#1E8449" for s in res["shift"]]
+    # One colour for resets. Direction is NOT encoded here: this chart answers
+    # "are resets distinguishable from ordinary seasons", and colouring by sign
+    # invites a direct read against Figure 2, which uses a different method and
+    # legitimately differs in sign at 2014 and 2017.
     ax.scatter(res["shift"], np.zeros(len(res)) - 0.06, s=150, marker="D",
-               color=colors, edgecolor="black", zorder=4,
+               color="#2B4C7E", edgecolor="black", zorder=4,
                label="seasons with a rule change (n=5)")
     # Stagger labels so near-coincident points (2014 and 2021-22) do not collide.
     order = res.sort_values("shift").reset_index(drop=True)
@@ -265,8 +282,10 @@ def readme_figures() -> None:
     ax.set_yticks([])
     ax.set_xlabel("change in field spread from one season to the next\n"
                   "← cars got closer      cars spread apart →")
-    ax.set_title("Rule changes compared with ordinary seasons",
-                 fontsize=13, loc="left")
+    ax.set_title("Rule changes compared with ordinary seasons\n"
+                 "Method: raw season-to-season change "
+                 "(the pre-existing trend is NOT removed)",
+                 fontsize=12, loc="left")
     ax.legend(fontsize=9, loc="upper left")
     ax.grid(axis="x", alpha=0.25)
     fig.tight_layout()

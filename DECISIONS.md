@@ -1742,3 +1742,93 @@ the abolition. **Tested and not detected, with the same floor.**
 **Operational note.** The run completed only after being made resumable
 (partial results written per session, completed sessions skipped on restart)
 following two stalls on hung FastF1 requests with no effective timeout.
+## 2026-09-07 — Entry 060 — The 2009 estimate is contaminated by the 2010 artifact; D1c logic was not extended to the primary metric
+
+**Question.** The 2009 boundary's estimation window runs to 2012 and therefore
+contains the 2010 measurement discontinuity in its post-period. Was that
+accounted for?
+
+**Status.** **No. Caught in review AFTER the memo was drafted.** Recorded here as
+it happened rather than retro-fitted into the plan.
+
+**What went wrong.** Entry 021 pre-committed the D1c restriction, and Entry 034
+applied it: M4 was withdrawn at 2009 precisely because the 2009 window contains
+2010. Entry 035 then recorded that the whole-field controls **also** stepped at
+2010, M2 at **1.93× the median reset shift** — the largest relative step of any
+metric, larger than M4's.
+
+**The pre-commitment named M4 and M5, so nothing was applied to M2.** The logic
+that justified withdrawing M4 at 2009 applies with equal or greater force to the
+primary metric, and it was not extended there at the time. Entry 035 recorded the
+control failure as an interpretation finding and did not follow it through to the
+2009 primary estimate.
+
+This was found by the analyst in review after `memo.md` was written and
+committed.
+
+**Quantified (a).** Re-estimated on a window truncated at 2009, which removes the
+artifact entirely:
+
+| window | b2 | 95% CI | seasons | events | slope estimable |
+|---|---:|---|---:|---:|:---:|
+| full (2006–2012, contains the artifact) | +0.9726 | [+0.6279, +1.3726] | 7 | 128 | yes |
+| truncated at 2009 | +0.4610 | [+0.0892, +0.9804] | 4 | 70 | **no** |
+
+**The estimate roughly halves.** It remains positive with an interval excluding
+zero. The truncated version rests on four seasons with a **single post-boundary
+season**, so `t × post` is degenerate and the slope term is **not identifiable at
+all** — the same structural problem as 2026. Its level estimate is correspondingly
+weak. That the truncated fit is barely estimable is itself part of the answer.
+
+**Flagged wherever it appears (b).** The memo's per-boundary table, Figure 2 (a
+flag on the 2009 row plus a footnote giving the truncated value), and
+`LIMITATIONS.md` §4.
+
+**Direction of the conclusion is unaffected (c).** Removing or halving 2009
+removes a **widening**, not a narrowing. "No boundary narrowed beyond trend"
+holds on four boundaries instead of five, and 2026 — the other Holm-surviving
+widening — is untouched.
+
+**Why this is a finding and not a repair (d).** The boundary described throughout
+this work as the "least contaminated" in the study, and used as such in §8.5,
+turns out to have a measurement discontinuity inside its own comparison window.
+That belongs in the memo body, and it is there.
+
+**Reproducible.** `src.phase5.boundary_2009_contamination`, written to
+`data/processed/boundary_2009_contamination.parquet`.
+
+---
+
+## 2026-09-07 — Entry 061 — Figures 2 and 3 contradicted each other on sight
+
+**Question.** Figure 2 (trend-corrected) put 2014 at +0.449, widening. Figure 3
+(raw difference) put 2014 at −0.39 and coloured it green for narrowing. Same
+boundary, opposite sign, opposite colour, adjacent in the README.
+
+**Status.** FIXED.
+
+**The defect.** A caption naming the specification was not enough, because
+**colour reads before text**. A reader scanning the two charts saw red-for-wider
+in one and green-for-narrower in the other for the same season and would
+reasonably conclude one of them was wrong.
+
+**Fixes applied.**
+1. **Direction colour-coding removed from Figure 3 entirely.** One colour for
+   rule-change seasons, one for ordinary seasons. That figure answers "are rule
+   changes distinguishable from ordinary seasons," not "which direction did each
+   go," and encoding direction invited a comparison the chart does not support.
+2. **The specification moved into the figure TITLE on both charts**, not the
+   caption — "trend-corrected (the pre-existing decline is removed)" against
+   "raw season-to-season change (the pre-existing trend is NOT removed)".
+3. **A pull-quote between them in the README** stating that the two use different
+   methods, that this is why 2014 and 2017 flip sides, and that the difference is
+   whether the pre-existing trend is removed — with the note that which question
+   is the right one is the single biggest judgement call in the analysis.
+4. **Figure 1 now shades 2006–2009** and draws it as a separate dashed series,
+   because Q3 is excluded there and the two eras are not on the same measurement
+   basis. Previously a reader saw one continuous line across a break the analysis
+   knows to exist.
+5. **The memo's "M2 falls from 1.21 in 2006 to 0.45 in 2025"** spanned the 2010
+   discontinuity. Restated within-era: 1.21 → 0.58 across 2006–09 and 1.79 → 0.45
+   across 2010–25. Both eras decline internally, so the claim survives, but it no
+   longer rests on a comparison across the break.

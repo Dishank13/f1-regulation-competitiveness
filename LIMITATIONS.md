@@ -144,6 +144,32 @@ Recorded before any result existed, in the plan.
   technical changes, Honda's withdrawal producing Brawn inside the window, and
   the 2008 financial crisis reshaping budgets in its pre-period (confound 14).
 
+- **The 2009 estimate is contaminated by the 2010 measurement artifact, and this
+  was found late.** The 2009 window runs to 2012, so its post-period contains
+  2010 — the season the grid went from ten constructors to twelve with three new
+  backmarkers, refuelling was banned, and the qualifying segment basis changed.
+  M2 steps at 2010 by 1.93× the median reset shift, so the 2009 estimate is
+  fitted against a step that is measurement rather than racing.
+
+  | window | b2 | 95% CI | seasons | slope estimable |
+  |---|---:|---|---:|:---:|
+  | full (2006–2012, contains the artifact) | +0.973 | [+0.628, +1.373] | 7 | yes |
+  | truncated at 2009 | +0.461 | [+0.089, +0.980] | 4 | **no** |
+
+  The estimate roughly halves. It stays positive with an interval excluding zero,
+  but the truncated version rests on four seasons with one post-boundary season,
+  so its slope term is unidentifiable and its level estimate is weak.
+
+  **The direction of the study's conclusion is unaffected**: removing 2009
+  removes a widening, not a narrowing, so "no boundary narrowed beyond trend"
+  holds on four boundaries instead of five.
+
+  **How it was missed.** The D1c pre-commitment named M4 and M5 and was applied
+  to them. Its logic was never extended to the primary metric, even after Phase 4
+  found M1 and M2 stepping at 2010 more strongly in relative terms than M4 did.
+  It was caught in review after the memo was first drafted. Recorded that way in
+  Entry 060 rather than presented as anticipated.
+
 - **H2 was downgraded before it was tested.** The longest uninterrupted
   stable-regulation period in 2006–2026 is **three seasons**. H2 is defined
   against "a comparable stable-regulation period," and none exists. This is a

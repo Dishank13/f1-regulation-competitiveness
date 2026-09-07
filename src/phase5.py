@@ -150,6 +150,33 @@ def run(tier: str = "a") -> dict:
     return out
 
 
+def boundary_2009_contamination(ev: pd.DataFrame) -> pd.DataFrame:
+    """The 2009 window contains the 2010 measurement artifact in its post-period.
+
+    The D1c pre-commitment named M4 and M5 and was applied to them. It was NOT
+    extended to the primary metric M2 at the time, even though Phase 4 found M1
+    and M2 also step at 2010 — M2 at 1.93x the median reset shift. So the 2009
+    M2 estimate is fitted against a post-period containing a step that is
+    measurement, not racing.
+
+    This quantifies it by re-estimating on a window truncated at 2009, which
+    removes the artifact entirely at the cost of leaving a single post-season.
+    """
+    rows = []
+    full = its_fit(ev, PRIMARY, 2009, window=4)
+    full["window"] = "full (2006-2012, contains the 2010 artifact)"
+    rows.append(full)
+
+    trunc = its_fit(ev[ev.season <= 2009], PRIMARY, 2009, window=4)
+    trunc["window"] = "truncated at 2009 (artifact excluded)"
+    rows.append(trunc)
+
+    df = pd.DataFrame(rows)
+    # b3 is not identifiable with one post-season: t*post is zero throughout.
+    df["b3_estimable"] = df.se3 > 1e-9
+    return df
+
+
 def main() -> None:
     res = run("a")
     pd.set_option("display.width", 250)
@@ -199,6 +226,14 @@ def main() -> None:
                   index=False)
     print(f"\nEXACT TEST COUNT: {len(pvals)} confirmatory + {len(sec)} secondary "
           f"= {len(pvals) + len(sec)} formally corrected tests.")
+
+    ev = pd.read_parquet(config.DATA_PROCESSED / "tier_a_event_metrics.parquet")
+    c = boundary_2009_contamination(ev)
+    print("\n=== 2009 BOUNDARY: contamination by the 2010 measurement artifact ===")
+    print(c[["window", "b2", "b2_lo", "b2_hi", "n_seasons", "n_events",
+             "b3_estimable"]].round(4).to_string(index=False))
+    c.to_parquet(config.DATA_PROCESSED / "boundary_2009_contamination.parquet",
+                 index=False)
 
 
 if __name__ == "__main__":

@@ -43,11 +43,48 @@ percent off the fastest car), segmented interrupted time series, level change
 
 | boundary | b2 (field-wide) | 95% CI | b2 (stratified, R16) | Holm |
 |---|---:|---|---:|:---:|
-| 2009 | **+0.973** | [+0.633, +1.382] | +0.888 | **survives** |
+| 2009 **⚑ contaminated** | **+0.973** | [+0.633, +1.382] | +0.888 | **survives** |
 | 2014 | +0.449 | [+0.062, +0.849] | +0.468 | does not |
 | 2017 | +0.133 | [−0.113, +0.382] | +0.025 | does not |
 | 2021–22 | −0.003 | [−0.455, +0.343] | +0.066 | does not |
 | 2026 | **+0.834** | [+0.621, +1.073] | +0.741 | **survives** |
+
+### ⚑ The 2009 estimate is contaminated, and we found it late
+
+The 2009 boundary's estimation window runs to 2012, so **its post-period
+contains the 2010 measurement discontinuity** — the season the grid went from
+ten constructors to twelve with three new backmarkers, refuelling was banned, and
+the qualifying segment basis changed. M2 steps at 2010 by 1.93× the median reset
+shift. That step is measurement, not racing, and the 2009 estimate is fitted
+against it.
+
+Re-estimating on a window truncated at 2009, which removes the artifact entirely:
+
+| window | b2 | 95% CI | seasons | slope estimable |
+|---|---:|---|---:|:---:|
+| full (2006–2012, contains the artifact) | **+0.973** | [+0.628, +1.373] | 7 | yes |
+| truncated at 2009 (artifact excluded) | **+0.461** | [+0.089, +0.980] | 4 | **no** |
+
+**The 2009 estimate roughly halves.** It stays positive with an interval
+excluding zero, but the truncated version rests on four seasons with a
+single post-boundary season, so its slope term is not identifiable at all and
+the level estimate is weak.
+
+**This does not change the direction of the conclusion.** Removing or halving
+2009 removes a *widening*, not a narrowing. The statement "no boundary narrowed
+beyond trend" holds on four boundaries instead of five, and 2026 — the other
+Holm-surviving widening — is untouched by this.
+
+We should have caught it earlier. The D1c pre-commitment named M4 and M5 and was
+applied to them; its logic was never extended to the primary metric even after
+Phase 4 showed M1 and M2 stepping at 2010 more strongly than M4 did. It was found
+in review after this memo was first drafted. Recorded as such in
+[`DECISIONS.md`](DECISIONS.md) Entry 060 rather than written up as though it had
+been anticipated.
+
+**The boundary described throughout this work as "least contaminated" turns out
+to have a measurement discontinuity inside its comparison window.** That is a
+finding about the study, not a repair to it.
 
 ### 2. Direction: three of five widened. None narrowed beyond trend.
 
@@ -57,7 +94,9 @@ level change does not, at p = 0.026 against a 0.010 threshold). 2017 is
 indistinguishable from nothing.
 
 **No boundary in the study shows the field narrowing beyond its pre-existing
-trend.**
+trend.** That statement survives the 2009 contamination flagged below: setting
+2009 aside entirely leaves it holding on four boundaries rather than five,
+because what 2009 contributes is a widening.
 
 The 2026 figure carries a specific correction. An eleventh constructor joined
 that season, and **29% of the measured widening is attributable to the new
@@ -96,9 +135,13 @@ Using the pre-registered language: **no measurable convergence effect.**
 
 ### 5. The field did converge — steadily, across two decades, regardless of resets
 
-M2 falls from 1.21 in 2006 to 0.45 in 2025. Every boundary has a negative
-pre-slope: the field was already converging before four of the five resets.
-That trend, not the resets, is where the convergence lives.
+The decline is best stated **within each measurement era**, because the 2010
+discontinuity sits between them and a single 2006→2025 figure would span it:
+1.21 → 0.58 across 2006–2009, and 1.79 → 0.45 across 2010–2025. Both eras
+decline steeply and internally, so the claim does not depend on comparing across
+the break. Every boundary also has a negative pre-slope: the field was already
+converging before four of the five resets. That trend, not the resets, is where
+the convergence lives.
 
 **Whether that secular trend is the regulations working slowly, or something
 else entirely, is beyond what this design can answer.** It is the study's central

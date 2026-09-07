@@ -46,7 +46,7 @@ design is as much the deliverable as the answer.
 | 7 — Memo and deliverables | Complete |
 
 The plan carries four amendments, each a separate commit stating what changed and
-why. The `pre-registration` tag has never moved. 59 decisions are logged in
+why. The `pre-registration` tag has never moved. 61 decisions are logged in
 [`DECISIONS.md`](DECISIONS.md), append-only.
 
 ## Headline numbers
@@ -56,7 +56,7 @@ Positive = the field widened at the reset.
 
 | boundary | level change | 95% CI | survives Holm |
 |---|---:|---|:---:|
-| 2009 | **+0.973** | [+0.633, +1.382] | yes |
+| 2009 ⚑ | **+0.973** | [+0.633, +1.382] | yes |
 | 2014 | +0.449 | [+0.062, +0.849] | no |
 | 2017 | +0.133 | [−0.113, +0.382] | no |
 | 2021–22 | −0.003 | [−0.455, +0.343] | no |
@@ -69,17 +69,29 @@ Pooled: +0.480 [−0.046, +1.007], p = 0.064 against a Holm threshold of 0.025 �
 season; the constant-constructor estimate is +0.596 [+0.388, +0.813]. 2026 covers
 13 of 23 rounds and is provisional.
 
+⚑ **The 2009 estimate is contaminated.** Its comparison window contains the 2010
+measurement change; excluding that halves it to **+0.461** [+0.089, +0.980]. It
+remains a widening, so the headline is unaffected. See
+[`memo.md`](memo.md) and [`LIMITATIONS.md`](LIMITATIONS.md).
+
 ## The result in three charts
 
 ![Spread of car pace across the field, 2006 to 2026](figures/fig1_field_spread.png)
 
 **How far apart the cars were, season by season.** Each dot is one season. Higher
 means the cars were more spread out in pace; lower means they were closer
-together. The line falls a long way across twenty years — the cars really did get
-closer. But look at *where* it falls: mostly in the gaps between the red lines,
-which mark the seasons a new rule package took effect. The purple line at 2010 is
-not a rule reset; it is the season three brand-new teams joined and refuelling was
-banned, which changed what we can measure as much as it changed the racing.
+together. The line falls steeply — the cars really did get closer. But look at
+*where* it falls: mostly in the gaps between the red lines, which mark the seasons
+a new rule package took effect.
+
+The shaded block on the left is drawn separately for a reason. **Before 2010 we
+are measuring something slightly different**, because qualifying then was run with
+race fuel on board and that part of the session has to be excluded. The purple
+line marks 2010, where three brand-new teams joined, refuelling was banned, and
+the measurement basis changed all at once — so the jump there is mostly *us*, not
+the racing. **Do not read the two sections as one continuous line.** Each declines
+steeply on its own, which is the point: 1.21 → 0.58 before the break, 1.79 → 0.45
+after it.
 
 ![Estimated change in field spread at each rule change, with uncertainty](figures/fig2_boundary_estimates.png)
 
@@ -90,19 +102,27 @@ tell the difference from "nothing happened at all." Two methods are shown becaus
 the choice between them is a judgement call, and we would rather show both than
 pick one quietly. **2009, 2014 and 2026 sit to the right of zero: the cars spread
 apart. 2017 and 2021–22 straddle zero: nothing measurable. Nothing sits clearly
-to the left.**
+to the left.** 2009 carries a flag: its comparison period contains the 2010
+measurement change, and excluding that halves the estimate to +0.46. It stays a
+widening either way.
+
+> **The next chart uses a different method, and that is why some seasons appear
+> to disagree with the one above.** The chart above removes the field's
+> pre-existing trend — the cars were already getting closer year on year — and
+> asks whether the rule change moved things *beyond* that. The chart below does
+> not remove the trend; it just shows the raw change from one season to the next.
+> **2014 and 2017 flip sides between the two for exactly that reason.** Neither
+> is wrong; they answer different questions, and which one you think is the right
+> question is the single biggest judgement call in this analysis.
 
 ![Rule-change seasons plotted among ordinary seasons](figures/fig3_placebo_comparison.png)
 
 **Rule changes compared with ordinary seasons.** The grey dots are ordinary
 seasons where nothing much changed in the rules — they show how much the field
-moves around on its own, year to year. The diamonds are the five rule changes.
-**If rule changes did something special, the diamonds should sit further from the
-centre than the grey dots do. They mostly do not.** Two of them (2009, 2026) sit
-out to the right, in the direction of the cars spreading *apart*. This chart uses
-the simpler of the two methods in the previous chart — the one that does not
-correct for the field already getting closer over time — which is why 2021–22
-appears further left here than above.
+moves around on its own, year to year. The dark diamonds are the five rule
+changes. **If rule changes did something special, the diamonds should sit further
+from the centre than the grey dots do. They mostly do not.** Two of them (2009,
+2026) sit out to the right, in the direction of the cars spreading apart.
 
 ## Method
 
