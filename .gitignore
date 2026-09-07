@@ -49,3 +49,7 @@ dist/
 Thumbs.db
 .vscode/
 .idea/
+
+# Guard against a shell variable failing to expand into a literal directory.
+$SCRATCH/
+${SCRATCH}/
