@@ -1433,3 +1433,264 @@ boundaries move M1 by a median of 0.44 and up to 0.65. Two of the five resets si
 inside that ordinary range on M1. Whether a reset that moves the field no more
 than an average season counts as "no effect" is the analyst's call, and it now
 rests on nine control boundaries rather than on 2010 alone.
+## 2026-09-07 — Entry 051 — B — primary metric FROZEN: M2, with M3 designated secondary
+
+**Question.** Which metric leads the confirmatory tests?
+
+**Status.** **DECIDED AND FROZEN** before Phase 5 ran.
+
+**Option chosen.** **M2 (robust field spread, IQR) primary. M3
+(leader→midfield) pre-registered as designated secondary**, reported alongside
+M2 at every boundary, not competing for a confirmatory slot.
+
+**Rationale, recorded before the confirmatory run so the choice is
+answer-independent.** The intent classification (Entry 006) established that the
+sport promised a closer **field** exactly once. The estimand of this study is
+whole-field convergence. **M2 measures that construct directly; M3 measures a
+different one** — the leader-to-midfield gap. The primary metric should match the
+estimand, and that reasoning holds regardless of what either metric shows.
+Grid-expansion robustness is a supporting argument, not the deciding one.
+
+**Their disagreement is a finding, not a nuisance.** On the simple level shift,
+M3's 2021–22 result exceeds every placebo while M2's sits at the 78th percentile.
+If that survives, the reading is that the package pulled the midfield toward the
+leaders **without compressing the field as a whole**. Those are different claims
+and the memo makes both.
+
+**Verified before freezing, as required.** M3 is computed as
+`M3_midfield_pct` — the median of the 30th–70th **percentile** band, not
+hardcoded ranks 4..7. The rank-based form exists separately as
+`M3_midfield_rank47` and is used only for R15. The placebo battery and all Phase
+5 results used the percentile definition, so the grid-robustness comparison
+against M2 is valid.
+
+---
+
+## 2026-09-07 — Entry 052 — Traffic gap stays at 5.0 s; 3.0 s becomes a mandatory R7 arm
+
+**Status.** DECIDED by the analyst. 5.0 s stands.
+
+**Reason given, recorded because it is the governing principle.** Reversing to
+3.0 s after learning that 5.0 s costs gate-3 quality would be choosing the
+threshold on its consequences — the exact thing the pre-commitment existed to
+prevent. The bias 5.0 s removes is also the more dangerous kind: traffic exposure
+correlates with car pace, and the amount of traffic in a race is a function of
+field spread, so the contamination correlates with the outcome across seasons.
+Estimator noise inflates level, not boundary comparisons.
+
+**Condition.** 3.0 s is a **mandatory R7 arm reported with equal prominence**,
+not a footnote. If the headline differs between 3.0 s and 5.0 s, the memo says so
+in the body.
+
+---
+
+## 2026-09-07 — Entry 053 — Traffic filter endogeneity (confound 21)
+
+**Question.** Is the fixed traffic gap a time-varying filter?
+
+**Status.** **Circuit mechanism CONFIRMED. Season drift not detected, with a weak
+bound. A separate and worse endogeneity FOUND.**
+
+**Circuit strictness.** Retention at 5.0 s ranges from **24.4% (Sakhir) to 49.8%
+(Turkey)** — a 25.4 point spread. A fixed absolute gap is far stricter at short
+circuits. Mechanism confirmed.
+
+**Season drift: not detected.** −0.544 pp/season, p = 0.411, 95% CI
+[−1.765, +0.677]. **Stated with its floor:** with n = 9 seasons this rules out
+drift beyond about 1.8 pp/season — roughly 14 points across the window — and
+nothing smaller. A weak bound, not a clean result. **R3 (constant-circuit) is
+therefore load-bearing, not precautionary**, and it is one of three checks that
+changes the significance verdict.
+
+**The worse finding — endogeneity.** Traffic retention correlates with measured
+field spread at **r = +0.950 (p < 0.001)** across the nine Tier B seasons
+(Spearman ρ = +0.967). A tighter field puts more cars within 5 s, so more laps
+are filtered: **the filter's strictness is a function of the quantity being
+estimated.**
+
+The induced bias runs opposite to the mechanism. Fewer surviving laps means
+noisier per-team estimates, and because M1 and M2 are dispersion measures,
+measurement error **inflates** them. The seasons where the field is genuinely
+tightest are the seasons where the estimator is noisiest and most inflated, so
+measured convergence is **attenuated** — the bias is conservative but the
+magnitudes are understated.
+
+**No clean escape exists.** Not filtering is worse: the unfiltered contamination
+(+0.65 s at a 1 s gap) also scales with field tightness. Both the filter and its
+absence are endogenous. This is a fundamental limitation of race-pace dispersion
+analysis, not an implementation defect.
+
+**Tier A is immune** — qualifying carries no traffic filter. A third independent
+reason Tier A leads and Tier B corroborates.
+
+**Not fixed by switching to a lap-time-relative gap.** That would be a metric
+change and is not made.
+
+---
+
+## 2026-09-07 — Entry 054 — Gate 3: nine failures investigated, none is a model failure
+
+**Question.** Plan §4.4 requires races failing both comparators to be manually
+investigated before inclusion, not auto-excluded.
+
+**Status.** ALL NINE INVESTIGATED. **All retained.** No genuine model failure.
+
+| race | ρ quali | ρ finish | laps/driver | wet | disposition |
+|---|---:|---:|---:|:---:|---|
+| 2018 German | 0.31 | 0.39 | 10.8 | yes | wet + thin fit; retain |
+| 2022 Monaco | 0.07 | −0.07 | 11.6 | yes | wet + Monaco; retain |
+| 2023 Belgian | 0.20 | 0.11 | 10.2 | yes | wet + thin fit; retain |
+| 2024 Monaco | 0.35 | 0.47 | 25.5 | no | **Monaco structural**; retain |
+| 2025 Bahrain | 0.47 | 0.44 | 9.3 | no | thinnest fit in the study; retain |
+| 2025 Emilia Romagna | 0.28 | 0.42 | 13.1 | no | thin fit; retain |
+| 2025 Monaco | 0.22 | 0.33 | 24.3 | no | **Monaco structural**; retain |
+| 2025 São Paulo | 0.35 | 0.45 | 19.1 | no | pace IQR 0.384% — field too close to rank; retain |
+| 2025 Qatar | 0.28 | 0.43 | 11.8 | no | thin fit; retain |
+
+**Monaco is a circuit-level limitation, not a threshold problem.** The initial
+hypothesis was that clean air is scarce at Monaco under a 5 s gap. **It is not:**
+Monaco retention is 36.9%, ranking **28th of 37 circuits** — mid-pack, not
+strict. The 2024 and 2025 Monaco races have 25.5 and 24.3 laps per driver, among
+the healthiest fits in the study, and the highest pace spread. The failure is
+that **race pace at Monaco reflects track position and tyre management rather
+than car performance** — everyone runs to a delta behind the car ahead. This is
+stated as a circuit-level limitation, not used as a reason to move the threshold.
+
+**São Paulo 2025 is the opposite case:** pace IQR of 0.384% against a
+passing-race median of 1.081%. The teams were genuinely too close to rank, so a
+rank correlation against any comparator is uninformative. Not a model failure.
+
+**Season concentration noted.** 2025 contributes 5 of 9 failures (22.7% of its
+races against ~5% elsewhere) and has the lowest median laps per driver-race
+(12.0). This is the Entry 053 endogeneity showing through: 2025 had the tightest
+field in the study, therefore the most traffic, therefore the fewest surviving
+laps, therefore the thinnest fits.
+
+---
+
+## 2026-09-07 — Entry 055 — Finding E CONFIRMED (confound 21b)
+
+**Question.** Was the Q2 starting-tyre rule real, and does it contaminate the
+metric?
+
+**Status.** **CONFIRMED as a phenomenon. Contamination TESTED and NOT DETECTED at
+achievable resolution.**
+
+**Evidence.** Q2 compound choice among Q3-reaching drivers, from FastF1
+qualifying laps:
+
+| season | Q2 on MEDIUM | Q2 on SOFT |
+|---|---:|---:|
+| 2019 | 24.9% | 75.1% |
+| 2020 | 28.6% | 58.9% |
+| 2021 | 34.2% | 57.1% |
+| **2022** | **0.5%** | **85.6%** |
+| 2023 | 11.8% | 80.5% |
+
+Share of Q3-reaching drivers whose Q2 compound differs from their Q3 compound:
+**32.0% in 2018–21 against 15.3% in 2022+, χ² p = 1.9 × 10⁻⁹.**
+
+The rule was in force through 2021 and abolished for 2022. It is a **time-varying
+change in what the Q2 segment measures**, landing precisely on the 2021–22
+boundary — the only boundary with Intent-C = Yes.
+
+**Contamination test.** The channel through which it would bias the metric is the
+front-minus-back Q1→Q2 offset differential used by the evolution adjustment. That
+shifts by **−0.034 s across the abolition, 95% CI [−0.075, +0.019]** — CI
+contains zero. **Recorded as tested-not-detected, not as resolved:** this rules
+out contamination above roughly 0.075 s and says nothing about smaller.
+
+**Why the metric survives it.** The min-across-adjusted-segments rule absorbs
+most of the effect: a front-runner's slow MEDIUM Q2 lap simply loses the minimum
+to their Q1 or Q3 lap.
+
+**Retrospective vindication.** This confirms that rejecting Option 2 (Q1+Q2 only)
+at Entry 014 was correct. Option 2 would have rested the entire metric on the one
+segment now confirmed to be contaminated in a time-varying way across the
+headline boundary.
+
+---
+
+## 2026-09-07 — Entry 056 — Phase 5 confirmatory result
+
+**Status.** RUN. **Neither confirmatory test rejects.** Reported, not interpreted.
+
+**Exact test count: 2 confirmatory + 9 secondary = 11 formally corrected tests.**
+The secondary family is 9, not the projected 10: the 2026 boundary has one
+post-period season, so its `t × post` column is degenerate and `b3` is **not
+estimable**. Excluded rather than reported as zero.
+
+**Confirmatory (Holm at α = 0.05):**
+- Pooled b2 (H1, level): μ = **+0.4804** [−0.0457, +1.0066], p = 0.0643 against a
+  Holm threshold of 0.025. **Does not reject.**
+- Pooled b3 (H2, slope): μ = +0.1502 [−0.2239, +0.5242], p = 0.2913. Does not
+  reject.
+
+**Heterogeneity is dominant: I² = 86.1% (b2), 87.4% (b3).** Plan §8.3 requires
+this be reported in place of, not after, the headline. **Two §9 falsification
+criteria fire independently:** (1) the pooled CI contains zero, and (5)
+heterogeneity is large enough that the pooled estimate averages incompatible
+effects.
+
+**Per-boundary b2 (M2):** 2009 +0.973, 2014 +0.449, 2017 +0.133,
+**2021–22 −0.003**, 2026 +0.834. Secondary family Holm-corrected: 2026 b2,
+2009 b2, 2009 b3 and 2014 b3 survive; 2014 b2 does not.
+
+**The trend control changes 2021–22 completely.** The simple pre/post difference
+gives −0.385 (78th placebo percentile); the segmented ITS gives −0.003. Every
+boundary has a negative pre-slope — the field was **already converging** before
+four of the five resets. This is Decision H item 1 and both numbers are reported.
+
+---
+
+## 2026-09-07 — Entry 057 — Robustness battery: the reporting rule cannot be applied as written
+
+**Status.** RUN, with a defect in the rule recorded.
+
+**Result.** 12 of 15 executed arms survive.
+
+**Defect 1 — the denominator.** Three checks are **not executable on the Tier A
+primary**: R7 (threshold sweep, a Tier B construct), R13 (PU-supplier grouping,
+Tier B), R16 (stratified offset, requires a cleaning re-run). Plan §11 sets the
+bar at **11 of 16**. Reporting "12 of 15" against that threshold silently changes
+the denominator. **The memo must state the executable denominator and must not
+claim the pre-registered threshold was met.**
+
+**Defect 2 — the rule mis-scores three checks.** R3 (constant-circuit,
+μ = +0.682 [+0.326, +1.038]), R4 (constant-constructor, μ = +0.315
+[+0.041, +0.590]) and R12 at ±3 seasons (μ = +0.524 [+0.179, +0.869]) all produce
+CIs **excluding** zero where the headline's includes it. The battery scores a
+changed significance verdict as failure — but all three point the **same
+direction** as the headline, more strongly, and all three roughly **halve the
+heterogeneity** (I² 86% → 56–62%).
+
+The substantive reading is the opposite of the mechanical score: restricting to
+constant circuits and constant constructors sharpens the estimate and reduces
+heterogeneity, which is what should happen if calendar and grid composition are
+the noise the plan said they were. **Both the mechanical score and this reading
+go in the memo.**
+
+---
+
+## 2026-09-07 — Entry 058 — B1 and the 2026 constant-constructor check
+
+**B1 — the 2009 boundary does not depend on the Brawn mapping.**
+Continuation b2 = +0.9726 [+0.633, +1.382]; Brawn-as-new-entity b2 = +0.9726
+[+0.631, +1.381]. **Identical to four decimal places.** The most contestable call
+in the continuity mapping, inside the least contaminated boundary, turns out not
+to matter — Brawn occupies the same position in the distribution either way and
+M2's IQR is unaffected by the lineage label. A worry checked and dismissed on
+evidence rather than assumed away.
+
+**Decision H item 2 — M2 is NOT immune at 2026.** M2's IQR is insensitive to a
+new entrant at the tail, but an eleventh constructor changes which teams fall
+inside the interquartile range.
+
+| 2026 estimate | b2 | 95% CI |
+|---|---:|---|
+| all constructors | +0.834 | [+0.616, +1.079] |
+| constant-constructor (R4) | +0.596 | [+0.388, +0.813] |
+
+**29% of the measured 2026 widening is attributable to the eleventh entrant**;
+71% survives with a CI excluding zero. Any 2026 statement must use the
+constant-constructor figure or say that it does not.
