@@ -100,8 +100,20 @@ def analyse_session(s) -> list[dict]:
     return out
 
 
+PARTIAL = None  # set in main()
+
+
 def main() -> None:
-    rows = []
+    # Resumable: a hung network request costs one session, not the run.
+    partial = config.DATA_PROCESSED / "finding_e_compounds.parquet"
+    done: set[tuple[int, int]] = set()
+    rows: list[dict] = []
+    if partial.exists():
+        prev = pd.read_parquet(partial)
+        rows = prev.to_dict("records")
+        done = set(map(tuple, prev[["season", "round"]].drop_duplicates().to_numpy()))
+        print(f"resuming: {len(done)} sessions already done", flush=True)
+
     for season in SEASONS:
         try:
             sched = fastf1.get_event_schedule(season, include_testing=False)
@@ -110,6 +122,8 @@ def main() -> None:
             continue
         for _, ev in sched.iterrows():
             rnd = int(ev["RoundNumber"])
+            if (season, rnd) in done:
+                continue
             try:
                 s = load_quali(season, rnd)
                 recs = analyse_session(s)
@@ -120,8 +134,11 @@ def main() -> None:
                 r.update({"season": season, "round": rnd,
                           "event": str(ev["EventName"])})
                 rows.append(r)
+            done.add((season, rnd))
             print(f"{season} r{rnd:<2} {str(ev['EventName'])[:30]:<30} "
                   f"records={len(recs)}", flush=True)
+            if rows:
+                pd.DataFrame(rows).to_parquet(partial, index=False)
 
     df = pd.DataFrame(rows)
     if df.empty:
