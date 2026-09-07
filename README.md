@@ -46,7 +46,7 @@ design is as much the deliverable as the answer.
 | 7 — Memo and deliverables | Complete |
 
 The plan carries four amendments, each a separate commit stating what changed and
-why. The `pre-registration` tag has never moved. 58 decisions are logged in
+why. The `pre-registration` tag has never moved. 59 decisions are logged in
 [`DECISIONS.md`](DECISIONS.md), append-only.
 
 ## Headline numbers
@@ -68,6 +68,41 @@ Pooled: +0.480 [−0.046, +1.007], p = 0.064 against a Holm threshold of 0.025 �
 29% of the 2026 widening is attributable to the eleventh constructor joining that
 season; the constant-constructor estimate is +0.596 [+0.388, +0.813]. 2026 covers
 13 of 23 rounds and is provisional.
+
+## The result in three charts
+
+![Spread of car pace across the field, 2006 to 2026](figures/fig1_field_spread.png)
+
+**How far apart the cars were, season by season.** Each dot is one season. Higher
+means the cars were more spread out in pace; lower means they were closer
+together. The line falls a long way across twenty years — the cars really did get
+closer. But look at *where* it falls: mostly in the gaps between the red lines,
+which mark the seasons a new rule package took effect. The purple line at 2010 is
+not a rule reset; it is the season three brand-new teams joined and refuelling was
+banned, which changed what we can measure as much as it changed the racing.
+
+![Estimated change in field spread at each rule change, with uncertainty](figures/fig2_boundary_estimates.png)
+
+**What happened at each rule change.** The dot is our best estimate of how the
+field changed at that rule change. The horizontal bar shows the range the true
+value plausibly sits in — a bar that crosses the black zero line means we cannot
+tell the difference from "nothing happened at all." Two methods are shown because
+the choice between them is a judgement call, and we would rather show both than
+pick one quietly. **2009, 2014 and 2026 sit to the right of zero: the cars spread
+apart. 2017 and 2021–22 straddle zero: nothing measurable. Nothing sits clearly
+to the left.**
+
+![Rule-change seasons plotted among ordinary seasons](figures/fig3_placebo_comparison.png)
+
+**Rule changes compared with ordinary seasons.** The grey dots are ordinary
+seasons where nothing much changed in the rules — they show how much the field
+moves around on its own, year to year. The diamonds are the five rule changes.
+**If rule changes did something special, the diamonds should sit further from the
+centre than the grey dots do. They mostly do not.** Two of them (2009, 2026) sit
+out to the right, in the direction of the cars spreading *apart*. This chart uses
+the simpler of the two methods in the previous chart — the one that does not
+correct for the field already getting closer over time — which is why 2021–22
+appears further left here than above.
 
 ## Method
 
@@ -121,25 +156,34 @@ change is a new commit stating what changed and why, never an amendment.
 ```bash
 git clone https://github.com/Dishank13/f1-regulation-competitiveness.git
 cd f1-regulation-competitiveness
-python -m venv .venv && source .venv/bin/activate  # Windows: .venv\Scripts\activate
+python -m venv .venv
+.venv/Scripts/activate        # Windows;  source .venv/bin/activate elsewhere
 pip install -r requirements.txt
-make all
+
+python -m src.pipeline            # acquisition through deliverables
+python -m src.pipeline analysis   # everything downstream of acquisition, no network
+python -m src.pipeline --list     # show every stage without running
 ```
 
-`make all` rebuilds every intermediate table from scratch. `make analysis` runs
-everything downstream of acquisition with no network access. `make verify` checks
-the decision ledger for duplicated or non-contiguous entries and fails loudly if
-either is present.
+**Use the Python entry point, not `make`.** `make` is not installed by default on
+Windows, which is where this analysis was run. A `Makefile` with the same stages
+is provided for anyone who has it, plus `make verify` to check the decision
+ledger for duplicated or non-contiguous entries.
 
-Raw API responses are cached locally and are not committed; the cache is
-populated on first run and reused afterwards. Acquisition is rate-limited
-upstream at 500 calls/hour and resumes from cache, so a re-run costs nothing for
-sessions already on disk. Processed tables are written to `data/processed/` as
-Parquet; the reports and ledgers in that directory are committed, the Parquet is
-not. Random seeds for all bootstraps are fixed and recorded.
+**A fresh clone must acquire before it can analyse.** The raw caches and the
+processed Parquet are gitignored, so `analysis` on a clean checkout stops with an
+explicit message telling you to run `acquire` first. Acquisition reads the FastF1
+live-timing API, which is rate limited to 500 calls/hour; it is resumable and
+cache-first, so re-running costs nothing for sessions already on disk, but the
+first full run takes several hours.
 
-`make findinge` runs the Q2 starting-tyre test. It is slow, rate-limited, and not
-required for the headline result.
+Processed tables are written to `data/processed/` as Parquet. The reports,
+ledgers and [`dictionary.md`](data/processed/dictionary.md) in that directory are
+committed; the Parquet is not. Random seeds for all bootstraps are fixed and
+recorded.
+
+`python -m src.finding_e` runs the Q2 starting-tyre test. It is slow,
+rate-limited, resumable, and not required for the headline result.
 
 ## Data sources
 

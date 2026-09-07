@@ -14,7 +14,7 @@ PY := python
 endif
 
 .PHONY: all analysis acquire coverage clean_tables model metrics tests figures \
-        diagnostics findinge deliverables
+        diagnostics docs findinge deliverables
 
 all: acquire analysis
 
@@ -28,7 +28,7 @@ acquire: coverage
 	$(PY) -m src.ingest.fastf1_races
 
 # --- Phases 2-6, no network ------------------------------------------------
-analysis: clean_tables model metrics tests diagnostics figures
+analysis: clean_tables model metrics tests diagnostics figures docs
 
 clean_tables:
 	$(PY) -m src.clean.session_format
@@ -58,6 +58,10 @@ diagnostics: metrics
 figures: model metrics
 	$(PY) -m src.figures
 	$(PY) -m src.figures decision_b
+	$(PY) -m src.figures readme
+
+docs: metrics
+	$(PY) -m src.data_dictionary
 
 # Optional: rate-limited, resumable, not required for the headline result.
 findinge:

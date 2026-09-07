@@ -163,6 +163,24 @@ anything.
   is why it leads — but the direction of that bias is toward understating
   convergence.
 
+**Capability diffusion, a named hypothesis this design cannot evaluate.** The
+steady convergence is consistent with capability spreading across the grid rather
+than with any rules change: simulation and CFD tools becoming cheaper and more
+widely licensed, composites manufacturing maturing into a supplier market,
+experienced aerodynamicists and race engineers circulating between teams, and
+standardised or shared components narrowing what a large budget can buy. On that
+account the field closed up because the knowledge and tooling needed to build a
+competitive car diffused outward, and the resets are incidental to it. **Testing
+this would require data this study does not have** — team headcount, wind tunnel
+and CFD hours, staff movement between constructors, and supplier relationships —
+none of which is in timing data. It is named here because it is the most
+plausible non-regulatory mechanism and because leaving it unnamed would imply the
+field was exhausted. **The tension is worth stating explicitly: the cost cap and
+the aerodynamic testing restrictions are themselves resource-equalisation
+measures.** If diffusion is the mechanism, part of that diffusion is regulatory,
+and the clean separation between "the rules did it" and "something else did it"
+does not survive contact with the 2021 package.
+
 ---
 
 ## Limitations

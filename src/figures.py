@@ -185,10 +185,106 @@ def decision_b() -> None:
     print(f"wrote {out}")
 
 
+def readme_figures() -> None:
+    """Three publication charts for the README. Captions are in the README."""
+    a = pd.read_parquet(config.DATA_PROCESSED / "tier_a_season_metrics.parquet")
+    resets = list(config.RESET_BOUNDARIES)
+
+    # --- (a) M2 over time -----------------------------------------------------
+    fig, ax = plt.subplots(figsize=(11, 5.4))
+    for i, r in enumerate(resets):
+        ax.axvline(r, color="#C0392B", lw=1.6, alpha=0.75, zorder=1,
+                   label="season a new rule package took effect" if i == 0 else None)
+    ax.axvline(2010, color="#7D3C98", lw=1.8, ls="-.", alpha=0.95, zorder=1,
+               label="2010 — measurement changes, not a rule reset")
+    ax.plot(a.season, a.M2_iqr, "o-", color="#2B4C7E", lw=2.4, ms=6, zorder=3,
+            label="spread of car pace")
+    ax.set_xlabel("season")
+    ax.set_ylabel("spread of car pace across the field\n(% off the fastest car)")
+    ax.set_title("How far apart the cars were, 2006–2026", fontsize=13, loc="left")
+    ax.set_xticks(resets + [2006, 2018])
+    ax.set_xticklabels([str(r) for r in resets] + ["2006", "2018"], fontsize=9)
+    ax.grid(alpha=0.25)
+    ax.margins(x=0.02)
+    ax.legend(fontsize=9, loc="upper right", framealpha=0.95)
+    fig.tight_layout()
+    fig.savefig(config.FIGURES / "fig1_field_spread.png", dpi=140)
+    plt.close(fig)
+
+    # --- (b) per-boundary estimates, both specifications ----------------------
+    fw = pd.read_parquet(config.DATA_PROCESSED / "phase5_boundaries_M2_iqr.parquet")
+    r16 = pd.read_parquet(config.DATA_PROCESSED / "r16_stratified.parquet")
+    m = fw[["label", "b2", "b2_lo", "b2_hi"]].merge(
+        r16[["label", "b2_stratified", "b2_lo_stratified", "b2_hi_stratified"]],
+        on="label")
+    y = np.arange(len(m))[::-1]
+
+    fig, ax = plt.subplots(figsize=(10, 4.6))
+    for off, (est, lo, hi), col, lab in (
+            (+0.15, ("b2", "b2_lo", "b2_hi"), "#2B4C7E", "main method"),
+            (-0.15, ("b2_stratified", "b2_lo_stratified", "b2_hi_stratified"),
+             "#E08A2E", "alternative method")):
+        ax.errorbar(m[est], y + off,
+                    xerr=[m[est] - m[lo], m[hi] - m[est]],
+                    fmt="o", color=col, ms=7, capsize=4, lw=2, label=lab)
+    ax.axvline(0, color="black", lw=1.4, zorder=0)
+    ax.set_yticks(y)
+    ax.set_yticklabels(m.label)
+    ax.set_xlabel("change in field spread at the rule change\n"
+                  "← cars got closer      cars spread apart →")
+    ax.set_title("What happened to the field at each rule change",
+                 fontsize=13, loc="left")
+    ax.legend(fontsize=9, loc="lower right")
+    ax.grid(axis="x", alpha=0.25)
+    fig.tight_layout()
+    fig.savefig(config.FIGURES / "fig2_boundary_estimates.png", dpi=140)
+    plt.close(fig)
+
+    # --- (c) placebo distribution with the resets inside it -------------------
+    pl = pd.read_parquet(config.DATA_PROCESSED / "placebo_tier_a.parquet")
+    pl = pl[pl.metric == "M2_iqr"]
+    plac = pl[pl.kind == "placebo"]["shift"].dropna()
+    res = pl[pl.kind == "reset"][["label", "shift"]].dropna()
+
+    fig, ax = plt.subplots(figsize=(11, 4.6))
+    ax.scatter(plac, np.zeros(len(plac)) + 0.06,
+               s=90, color="#9AA5B1", edgecolor="white", zorder=3,
+               label=f"ordinary seasons, no rule change (n={len(plac)})")
+    colors = ["#C0392B" if s > 0 else "#1E8449" for s in res["shift"]]
+    ax.scatter(res["shift"], np.zeros(len(res)) - 0.06, s=150, marker="D",
+               color=colors, edgecolor="black", zorder=4,
+               label="seasons with a rule change (n=5)")
+    # Stagger labels so near-coincident points (2014 and 2021-22) do not collide.
+    order = res.sort_values("shift").reset_index(drop=True)
+    for i, r in order.iterrows():
+        dy = -20 if i % 2 == 0 else -34
+        ax.annotate(r.label, (r["shift"], -0.06), textcoords="offset points",
+                    xytext=(0, dy), ha="center", fontsize=9)
+    ax.axvline(0, color="black", lw=1.2)
+    ax.set_ylim(-0.30, 0.16)
+    ax.set_yticks([])
+    ax.set_xlabel("change in field spread from one season to the next\n"
+                  "← cars got closer      cars spread apart →")
+    ax.set_title("Rule changes compared with ordinary seasons",
+                 fontsize=13, loc="left")
+    ax.legend(fontsize=9, loc="upper left")
+    ax.grid(axis="x", alpha=0.25)
+    fig.tight_layout()
+    fig.savefig(config.FIGURES / "fig3_placebo_comparison.png", dpi=140)
+    plt.close(fig)
+
+    for f in ("fig1_field_spread.png", "fig2_boundary_estimates.png",
+              "fig3_placebo_comparison.png"):
+        print(f"wrote {config.FIGURES / f}")
+
+
 def main() -> None:
     import sys
     if len(sys.argv) > 1 and sys.argv[1] == "decision_b":
         decision_b()
+        return
+    if len(sys.argv) > 1 and sys.argv[1] == "readme":
+        readme_figures()
         return
     df = residual_frame()
     df.to_parquet(config.DATA_PROCESSED / "pace_residuals.parquet", index=False)
