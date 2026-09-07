@@ -124,8 +124,8 @@ denominator explicitly and not claim the pre-registered threshold was met.**
 **The attack.** Finding E is now confirmed: the Q2 starting-tyre rule was in
 force through 2021 and abolished for 2022. Q2 MEDIUM usage among Q3-reaching
 drivers runs 24.9% / 28.6% / 34.2% in 2019–21 and collapses to **0.5% in 2022**
-(differ-rate 32.0% vs 15.3%, χ² p = 1.9 × 10⁻⁹). That is a change in what the Q2
-segment *measures*, landing precisely on the boundary with Intent-C = Yes.
+(differ-rate 32.0% vs 8.0%, χ² p = 6.3 × 10⁻³⁹ over the complete 2018–2026 run).
+That is a change in what the Q2 segment *measures*, landing precisely on the boundary with Intent-C = Yes.
 
 **Does it succeed?** The mechanism is real and confirmed. The contamination is
 **tested and not detected** through the channel that would matter: the

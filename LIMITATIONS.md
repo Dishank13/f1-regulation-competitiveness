@@ -101,8 +101,10 @@ resolution limit of the check.
 
 - **The Q2 starting-tyre rule was real and time-varying.** Q2 MEDIUM usage among
   Q3-reaching drivers runs 24.9% / 28.6% / 34.2% across 2019–21 then collapses to
-  0.5% in 2022 (χ² p = 1.9 × 10⁻⁹). It changes what the Q2 segment measures,
-  landing exactly on the only boundary that promised field convergence.
+  0.5% in 2022, and stays at or below 8.8% through 2026 (differ-rate 32.0% in
+  2018–21 against 8.0% in 2022–26, χ² p = 6.3 × 10⁻³⁹, complete run). It changes
+  what the Q2 segment measures, landing exactly on the only boundary that
+  promised field convergence.
   **Contamination tested and not detected** through the channel that matters —
   the front-minus-back Q1→Q2 differential shifts −0.034 s [−0.075, +0.019] — which
   rules out contamination above roughly 0.075 s and says nothing below it

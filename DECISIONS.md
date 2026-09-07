@@ -1694,3 +1694,51 @@ inside the interquartile range.
 **29% of the measured 2026 widening is attributable to the eleventh entrant**;
 71% survives with a CI excluding zero. Any 2026 statement must use the
 constant-constructor figure or say that it does not.
+## 2026-09-07 — Entry 059 — Finding E completed; preliminary figures superseded
+
+**Question.** Entry 055 reported Finding E from a partial run (2018–2023, 120 of
+185 sessions) because the acquisition had stalled. The full run has now
+completed. Do the final numbers change the conclusion?
+
+**Status.** COMPLETE — all 185 sessions, 2018–2026. **Conclusion unchanged;
+the effect is substantially stronger than the preliminary figures showed.**
+
+**Superseded figures.** Entry 055 is append-only and is left intact. The
+preliminary numbers it reports (differ-rate 32.0% against 15.3%, χ² p = 1.9 ×
+10⁻⁹) are superseded by the complete run below, and the two committed documents
+that cited them — `LIMITATIONS.md` and `phase6_red_team.md` — have been updated.
+
+**Final result.** Q2 compound choice among Q3-reaching drivers, all 185 sessions:
+
+| season | Q2 on SOFT | Q2 on MEDIUM |
+|---|---:|---:|
+| 2019 | 75.1% | 24.9% |
+| 2020 | 58.9% | 28.6% |
+| 2021 | 57.1% | **34.2%** |
+| 2022 | 85.6% | **0.5%** |
+| 2023 | 84.9% | 9.1% |
+| 2024 | 92.0% | 0.0% |
+| 2025 | 89.0% | 6.6% |
+| 2026 | 99.2% | 0.0% |
+
+Share of Q3-reaching drivers whose Q2 compound differs from their Q3 compound:
+**32.0% in 2018–21 against 8.0% in 2022–26, χ² p = 6.3 × 10⁻³⁹** (n = 801 and
+1,028).
+
+**Why the effect strengthened.** The partial run ended at 2023, which at 16.9%
+was the highest post-rule season. Adding 2024 (0.8%), 2025 (8.8%) and 2026 (0.8%)
+drops the post-rule figure from 15.3% to 8.0% and moves the p-value from
+10⁻⁹ to 10⁻³⁹.
+
+**Nothing else changes.** The rule was in force through 2021 and abolished for
+2022, exactly as Entry 055 stated. The contamination test is unaffected — it was
+computed on the Tier A qualifying table, not on this dataset, and the
+front-minus-back Q1→Q2 differential still shifts −0.034 s [−0.075, +0.019] across
+the abolition. **Tested and not detected, with the same floor.**
+
+**Not in the memo.** Finding E cites no figure in `memo.md`; it appears only in
+`LIMITATIONS.md` and the red team document. The memo required no change.
+
+**Operational note.** The run completed only after being made resumable
+(partial results written per session, completed sessions skipped on restart)
+following two stalls on hung FastF1 requests with no effective timeout.
